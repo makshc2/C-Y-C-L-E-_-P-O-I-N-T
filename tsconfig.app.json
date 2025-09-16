@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./app",
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -14,6 +14,8 @@
     "jsx": "preserve",
     "types": ["vite/client", "quasar"]
   },
-  "include": ["src/**/*", "env.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*", "env.d.ts"],
+  "exclude": [
+    "app/node_modules", "dist"]
 }
