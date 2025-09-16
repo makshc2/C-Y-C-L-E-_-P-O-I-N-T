@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getRaces, deleteRace, clearRaces, type RaceRecord } from '@/services/localDb'
+import { formatTime } from '@/utils/time'
 
 const rows = ref<RaceRecord[]>([])
 const expanded = ref<string[]>([])
@@ -10,6 +11,12 @@ function fmtDate(iso: string) { return new Date(iso).toLocaleString() }
 function fmtWinner(r: RaceRecord) {
   if (r.winner === 'tie') return 'Нічия'
   return r.winner === 1 ? r.runner1.name : r.runner2.name
+}
+function fmtTimes(r: RaceRecord) {
+  return `${formatTime(r.time1)} / ${formatTime(r.time2)}`
+}
+function fmtMs(ms: number | null | undefined) {
+  return formatTime(ms)
 }
 
 function removeOne(id: string) {
@@ -22,6 +29,20 @@ function clearAll() {
 }
 
 onMounted(load)
+
+const columns = [
+  { name: 'date',   label: 'Дата',       field: (r: RaceRecord) => fmtDate(r.dateIso), align: 'left',  sortable: true },
+  { name: 'names',  label: 'Суперники',  field: (r: RaceRecord) => `${r.runner1.name} vs ${r.runner2.name}`, align: 'left' },
+  { name: 'finish', label: 'Фініш, м',   field: 'finishMeters', align: 'right', sortable: true },
+  { name: 'times',  label: 'Часи',       field: (r: RaceRecord) => fmtTimes(r), align: 'left' },
+  { name: 'winner', label: 'Переможець', field: (r: RaceRecord) => fmtWinner(r), align: 'left' },
+  { name: 'actions',label: '',           field: 'id', align: 'right' }
+]
+
+const lapColumns = [
+  { name: 'm',  label: 'Дистанція, м', field: 'atMeters', align: 'left' },
+  { name: 't',  label: 'Час',          field: (row: { atMs: number }) => fmtMs(row.atMs), align: 'left' }
+]
 </script>
 
 <template>
@@ -36,21 +57,17 @@ onMounted(load)
     </div>
 
     <q-table
-        flat bordered
+        flat
+        bordered
         :rows="rows"
         row-key="id"
-        :columns="[
-        { name:'date',   label:'Дата',     field: r => fmtDate(r.dateIso), align:'left', sortable:true },
-        { name:'names',  label:'Суперники', field: r => r.runner1.name + ' vs ' + r.runner2.name, align:'left' },
-        { name:'finish', label:'Фініш, м', field: 'finishMeters', align:'right', sortable:true },
-        { name:'times',  label:'Часи (мс)', field: r => `${r.time1 ?? '—'} / ${r.time2 ?? '—'}`, align:'left' },
-        { name:'winner', label:'Переможець', field: r => fmtWinner(r), align:'left' },
-        { name:'actions', label:'', field:'id', align:'right' }
-      ]"
+        :columns="columns"
         :pagination="{ rowsPerPage: 10 }"
         :expanded="expanded"
         @update:expanded="val => expanded = val"
+        no-data-label="Поки що немає записів"
     >
+      <!-- Дії -->
       <template #body-cell-actions="props">
         <q-td :props="props">
           <q-btn dense flat icon="unfold_more" @click="props.expand = !props.expand">
@@ -72,14 +89,14 @@ onMounted(load)
                     Лапи — {{ props.row.runner1.name }}
                   </div>
                   <q-table
-                      flat bordered dense
+                      flat
+                      bordered
+                      dense
                       :rows="props.row.laps1"
-                      :columns="[
-                      { name:'m',  label:'Дистанція, м', field:'atMeters', align:'left' },
-                      { name:'ms', label:'Час, мс',      field:'atMs',     align:'left' }
-                    ]"
+                      :columns="lapColumns"
                       row-key="atMeters"
                       :pagination="{ rowsPerPage: 10 }"
+                      no-data-label="Лапів немає"
                   />
                 </q-card>
               </div>
@@ -89,14 +106,14 @@ onMounted(load)
                     Лапи — {{ props.row.runner2.name }}
                   </div>
                   <q-table
-                      flat bordered dense
+                      flat
+                      bordered
+                      dense
                       :rows="props.row.laps2"
-                      :columns="[
-                      { name:'m',  label:'Дистанція, м', field:'atMeters', align:'left' },
-                      { name:'ms', label:'Час, мс',      field:'atMs',     align:'left' }
-                    ]"
+                      :columns="lapColumns"
                       row-key="atMeters"
                       :pagination="{ rowsPerPage: 10 }"
+                      no-data-label="Лапів немає"
                   />
                 </q-card>
               </div>

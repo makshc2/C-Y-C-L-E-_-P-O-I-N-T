@@ -7,6 +7,7 @@ import WinnerDialog from '../components/modals/WinnerDialog.vue'
 import { WHEEL_OPTIONS, DEFAULT_WHEEL_CIRC } from '../constants/wheels'
 import { addRace, type Lap, type RaceRecord } from '../services/localDb'
 import { formatTime } from '../utils/time'
+import { Notify } from 'quasar'
 
 const DEV1_COLOR = '#e53935'
 const DEV2_COLOR = '#1e88e5'
@@ -29,7 +30,30 @@ const timeText = computed(() => formatTime(dev1.elapsedMs.value))
 
 const startSim = () => { dev1.startSim(40); dev2.startSim(35) }
 const stopSim  = () => { dev1.stopSim();    dev2.stopSim() }
-const connectBoth = async () => { await Promise.allSettled([dev1.connect(), dev2.connect()]) }
+const connectBoth = async () => {
+  if (supportHint.value) {
+    Notify.create({ type: 'negative', message: supportHint.value })
+    return
+  }
+
+  const r1 = await dev1.connect()
+  if (r1 === 'connected') {
+    Notify.create({ type: 'positive', message: `${name1.value || 'Гонщик 1'} підключений` })
+  } else if (r1 === 'cancelled') {
+    Notify.create({ type: 'warning', message: `Підключення ${name1.value || 'Гонщик 1'} скасовано` })
+  } else {
+    Notify.create({ type: 'negative', message: `Помилка підключення ${name1.value || 'Гонщик 1'}` })
+  }
+
+  const r2 = await dev2.connect()
+  if (r2 === 'connected') {
+    Notify.create({ type: 'positive', message: `${name2.value || 'Гонщик 2'} підключений` })
+  } else if (r2 === 'cancelled') {
+    Notify.create({ type: 'warning', message: `Підключення ${name2.value || 'Гонщик 2'} скасовано` })
+  } else {
+    Notify.create({ type: 'negative', message: `Помилка підключення ${name2.value || 'Гонщик 2'}` })
+  }
+}
 
 const laps1 = ref<Lap[]>([])
 const laps2 = ref<Lap[]>([])
@@ -177,7 +201,7 @@ onMounted(() => {
         </div>
 
         <div class="row q-col-gutter-sm q-mb-md justify-end">
-<!--          <div class="col-6 col-sm-auto"><q-btn color="primary" class="full-width" label="Підключити обидва" @click="connectBoth" /></div>-->
+          <div class="col-6 col-sm-auto"><q-btn color="primary" class="full-width" label="Підключити обидва" @click="connectBoth" /></div>
           <div class="col-6 col-sm-auto"><q-btn color="primary" outline class="full-width" label="Підключити 1" @click="dev1.connect" /></div>
           <div class="col-6 col-sm-auto"><q-btn color="primary" outline class="full-width" label="Підключити 2" @click="dev2.connect" /></div>
           <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>

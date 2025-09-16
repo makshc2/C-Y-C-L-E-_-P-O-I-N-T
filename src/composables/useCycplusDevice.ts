@@ -74,38 +74,45 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
             status.value = 'Зупинено'
         }
     }
+        async function connect(): Promise<'connected' | 'cancelled' | 'error'> {
+            try {
+                status.value = 'Запит пристрою…'
 
-    async function connect() {
-        try {
-            status.value = 'Запит пристрою…'
-            device = await navigator.bluetooth.requestDevice({
-                // filters: [{ namePrefix: 'CYCPLUS' }],
-                acceptAllDevices: true,
-                optionalServices: [0x1816]
-            })
-            device.addEventListener('gattserverdisconnected', onDisconnected)
+                const dev = await navigator.bluetooth.requestDevice({
+                    // filters: [{ namePrefix: 'CYCPLUS' }],
+                    acceptAllDevices: true,
+                    optionalServices: [0x1816]
+                })
+                device = dev
+                device.addEventListener('gattserverdisconnected', onDisconnected)
 
-            status.value = 'Підключення…'
-            const server = await device.gatt!.connect()
-            const service = await server.getPrimaryService(0x1816)
-            characteristic = await service.getCharacteristic(0x2A5B)
+                status.value = 'Підключення…'
+                const server = await device.gatt!.connect()
+                const service = await server.getPrimaryService(0x1816)
+                characteristic = await service.getCharacteristic(0x2A5B)
 
-            await characteristic.startNotifications()
-            characteristic.addEventListener('characteristicvaluechanged', onCscNotification as any)
+                await characteristic.startNotifications()
+                characteristic.addEventListener('characteristicvaluechanged', onCscNotification as any)
 
-            status.value = 'Підключено'
-            if (elapsedMs.value === 0) startElapsed()
-        } catch (e: any) {
-            console.error('BLE error:', e)
-            status.value = '❌ Помилка підключення'
+                status.value = 'Підключено'
+                if (elapsedMs.value === 0) startElapsed()
+                return 'connected'
+            } catch (e: any) {
+                if (e?.name === 'NotFoundError' || e?.message?.includes('cancelled')) {
+                    status.value = 'Скасовано користувачем'
+                    return 'cancelled'
+                }
+                console.error('BLE error:', e)
+                status.value = '❌ Помилка підключення'
+                return 'error'
+            }
         }
-    }
+
 
     function onDisconnected() {
         status.value = 'Роз’єднано'
     }
 
-    // Обробка CSC Measurement (спиці колеса)
     function onCscNotification(event: Event) {
         const dv = (event as any).target.value as DataView
         const flags = dv.getUint8(0)
