@@ -7,11 +7,9 @@
     "dev": "vite --open --port 5173",
     "dev:host": "vite --open --host --port 5173",
     "dev:https": "vite --open --https --host --port 5173 --cert .cert/localhost.pem --key .cert/localhost-key.pem",
-
     "typecheck": "vue-tsc --noEmit",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --port 4173",
-
     "quasar:icons": "echo '(@quasar/extras підключений, окремий крок не потрібен)'"
   },
   "dependencies": {
@@ -23,6 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.5.0",
+    "@types/web-bluetooth": "^0.0.21",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
     "sass-embedded": "^1.92.1",
