@@ -1,30 +1,25 @@
-// src/composables/useCycplusDevice.ts
 import { ref, type Ref } from 'vue'
 
 type UseCycplusOptions = {
-    wheelCircumference: Ref<number> // довжина кола колеса, м
+    wheelCircumference: Ref<number>
 }
 
 type CscCharacteristic = BluetoothRemoteGATTCharacteristic
 
 export default function useCycplusDevice(opts: UseCycplusOptions) {
-    // реактивний стан
-    const angle = ref<number>(-120)           // поточний кут стрілки
-    const targetAngle = ref<number>(-120)     // цільовий кут
+    const angle = ref<number>(-120)
+    const targetAngle = ref<number>(-120)
     const speedKmh = ref<number>(0)
     const distanceM = ref<number>(0)
     const elapsedMs = ref<number>(0)
     const status = ref<string>('Очікування…')
 
-    // BLE
     let device: BluetoothDevice | null = null
     let characteristic: CscCharacteristic | null = null
 
-    // дані CSC
     let lastRevs = 0
     let lastTime1024 = 0
 
-    // анімація стрілки
     let rafId: number | null = null
     function animateNeedle() {
         const cur = angle.value
@@ -39,13 +34,11 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         }
     }
     function setAngleByDistance(meters: number) {
-        // шкала 0..200 м → -120..+120
         const capped = Math.min(Math.max(meters, 0), 200)
         targetAngle.value = -120 + (capped / 200) * 240
         if (rafId == null) rafId = requestAnimationFrame(animateNeedle)
     }
 
-    // таймер гонки
     let startTs = 0
     let tickTimer: number | null = null
     function startElapsed() {
@@ -62,7 +55,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         }
     }
 
-    // симуляція (для розробки)
     let simTimer: number | null = null
     function startSim(stepMetersPerTick = 40, tickMs = 1000) {
         stopSim()
@@ -70,7 +62,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         if (elapsedMs.value === 0) startElapsed()
         simTimer = window.setInterval(() => {
             distanceM.value = Math.min(10000, distanceM.value + stepMetersPerTick)
-            // проста модель швидкості: крок/сек → м/с → км/год
             const kmh = (stepMetersPerTick / (tickMs / 1000)) * 3.6
             speedKmh.value = kmh
             setAngleByDistance(distanceM.value)
@@ -84,13 +75,13 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         }
     }
 
-    // BLE підключення
     async function connect() {
         try {
             status.value = 'Запит пристрою…'
             device = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'CYCPLUS' }],
-                optionalServices: [0x1816] // CSC service
+                // filters: [{ namePrefix: 'CYCPLUS' }],
+                acceptAllDevices: true,
+                optionalServices: [0x1816]
             })
             device.addEventListener('gattserverdisconnected', onDisconnected)
 
@@ -126,7 +117,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
 
         if (lastTime1024 !== 0 && cumulativeRevs !== lastRevs) {
             const deltaRevs = cumulativeRevs - lastRevs
-            // врахування overflow (модуль 65536)
             const deltaTimeSec = ((lastWheelEventTime - lastTime1024 + 65536) % 65536) / 1024
 
             const wheelCirc = opts.wheelCircumference.value // м
@@ -142,7 +132,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         lastTime1024 = lastWheelEventTime
     }
 
-    // Скидання стану
     function reset() {
         stopSim()
         stopElapsed()
@@ -157,9 +146,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     return {
-        // state
         angle, targetAngle, speedKmh, distanceM, elapsedMs, status,
-        // actions
         connect, startSim, stopSim, reset
     }
 }

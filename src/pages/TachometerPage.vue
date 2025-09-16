@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch, watchEffect, onMounted } from 'vue'
-import useCycplusDevice from '@/composables/useCycplusDevice'
-import ensureSupport from '@/composables/useWebBluetoothSupport'
-import TachometerGauge from '@/components/TachometerGauge.vue'
-import WinnerDialog from '@/components/modals/WinnerDialog.vue'
-import { WHEEL_OPTIONS, DEFAULT_WHEEL_CIRC } from '@/constants/wheels'
-import { addRace, type Lap, type RaceRecord } from '@/services/localDb'
-import { formatTime } from '@/utils/time'
+import useCycplusDevice from '../composables/useCycplusDevice'
+import ensureSupport from '../composables/useWebBluetoothSupport'
+import TachometerGauge from '../components/TachometerGauge.vue'
+import WinnerDialog from '../components/modals/WinnerDialog.vue'
+import { WHEEL_OPTIONS, DEFAULT_WHEEL_CIRC } from '../constants/wheels'
+import { addRace, type Lap, type RaceRecord } from '../services/localDb'
+import { formatTime } from '../utils/time'
 
 const DEV1_COLOR = '#e53935'
 const DEV2_COLOR = '#1e88e5'
@@ -177,7 +177,7 @@ onMounted(() => {
         </div>
 
         <div class="row q-col-gutter-sm q-mb-md justify-end">
-          <div class="col-6 col-sm-auto"><q-btn color="primary" class="full-width" label="Підключити обидва" @click="connectBoth" /></div>
+<!--          <div class="col-6 col-sm-auto"><q-btn color="primary" class="full-width" label="Підключити обидва" @click="connectBoth" /></div>-->
           <div class="col-6 col-sm-auto"><q-btn color="primary" outline class="full-width" label="Підключити 1" @click="dev1.connect" /></div>
           <div class="col-6 col-sm-auto"><q-btn color="primary" outline class="full-width" label="Підключити 2" @click="dev2.connect" /></div>
           <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>
