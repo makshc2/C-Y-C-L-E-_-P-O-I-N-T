@@ -6,6 +6,7 @@ import TachometerGauge from '@/components/TachometerGauge.vue'
 import WinnerDialog from '@/components/modals/WinnerDialog.vue'
 import { WHEEL_OPTIONS, DEFAULT_WHEEL_CIRC } from '@/constants/wheels'
 import { addRace, type Lap, type RaceRecord } from '@/services/localDb'
+import { formatTime } from '@/utils/time'
 
 const DEV1_COLOR = '#e53935'
 const DEV2_COLOR = '#1e88e5'
@@ -24,12 +25,7 @@ const dev2 = useCycplusDevice({ wheelCircumference })
 
 const supportHint = computed(() => ensureSupport())
 
-const timeText = computed(() => {
-  const ms = Math.floor(dev1.elapsedMs.value)
-  const m = Math.floor(ms / 60000)
-  const s = Math.floor((ms % 60000) / 1000)
-  return `${m} хв ${s} сек`
-})
+const timeText = computed(() => formatTime(dev1.elapsedMs.value))
 
 const startSim = () => { dev1.startSim(40); dev2.startSim(35) }
 const stopSim  = () => { dev1.stopSim();    dev2.stopSim() }
@@ -98,21 +94,28 @@ function onFinishComputed() {
 
   const d1 = dev1.distanceM.value
   const d2 = dev2.distanceM.value
-  const justFinished1 = d1 >= finishMeters.value && finishTime1.value == null
-  const justFinished2 = d2 >= finishMeters.value && finishTime2.value == null
 
-  if (!justFinished1 && !justFinished2) return
+  const finished1now = d1 >= finishMeters.value && finishTime1.value == null
+  const finished2now = d2 >= finishMeters.value && finishTime2.value == null
 
-  if (justFinished1) finishTime1.value = dev1.elapsedMs.value
-  if (justFinished2) finishTime2.value = dev2.elapsedMs.value
+  if (!finished1now && !finished2now) return
+  if (finished1now) finishTime1.value = dev1.elapsedMs.value
+  if (finished2now) finishTime2.value = dev2.elapsedMs.value
 
-  if (justFinished1 && justFinished2) {
+  if (finished1now && !finished2now && finishTime2.value == null) {
+    finishTime2.value = dev2.elapsedMs.value
+  }
+  if (finished2now && !finished1now && finishTime1.value == null) {
+    finishTime1.value = dev1.elapsedMs.value
+  }
+
+  if (finished1now && finished2now) {
     const t1 = finishTime1.value ?? 0
     const t2 = finishTime2.value ?? 0
-    const eps = 5 // мс
+    const eps = 5
     winner.value = Math.abs(t1 - t2) <= eps ? 'tie' : (t1 < t2 ? 1 : 2)
   } else {
-    winner.value = justFinished1 ? 1 : 2
+    winner.value = finished1now ? 1 : 2
   }
 
   stopSim()
