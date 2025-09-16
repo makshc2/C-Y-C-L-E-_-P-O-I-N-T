@@ -190,7 +190,7 @@ onMounted(() => {
                 v-model="wheelCircumference"
                 :options="WHEEL_OPTIONS"
                 emit-value map-options
-                label="Довжина кола (м)"
+                label="Розмір колеса"
                 dense outlined standout="bg-grey-2"
             />
           </div>
