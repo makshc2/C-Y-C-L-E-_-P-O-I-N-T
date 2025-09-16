@@ -5,7 +5,7 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
-    base: '/C-Y-C-L-E-_-P-O-I-N-T/',   // ✅ обов’язково для GitHub Pages
+    base: '/C-Y-C-L-E-_-P-O-I-N-T/',
     plugins: [
         vue({ template: { transformAssetUrls } }),
         quasar({
