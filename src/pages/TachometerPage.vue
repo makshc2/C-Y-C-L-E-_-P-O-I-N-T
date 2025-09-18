@@ -12,8 +12,19 @@ import { Notify } from 'quasar'
 const DEV1_COLOR = '#e53935'
 const DEV2_COLOR = '#1e88e5'
 
-const wheelCircumference = ref<number>(DEFAULT_WHEEL_CIRC)
-const finishMeters = ref<number>(200)
+const wheelCircumference1 = ref<number>(DEFAULT_WHEEL_CIRC)
+const wheelCircumference2 = ref<number>(DEFAULT_WHEEL_CIRC)
+
+const rawFinish = ref<number>(200)
+const finishMeters = computed({
+  get: () => {
+    const s = 50
+    const v = Math.max(200, rawFinish.value)
+    return Math.round(v / s) * s
+  },
+  set: (val: number) => { rawFinish.value = val }
+})
+
 const lapStepMeters = ref<number>(50)
 const autoRestartEnabled = ref<boolean>(false)
 const autoRestartSeconds = ref<number>(5)
@@ -21,8 +32,8 @@ const autoRestartSeconds = ref<number>(5)
 const name1 = ref('Гонщик 1')
 const name2 = ref('Гонщик 2')
 
-const dev1 = useCycplusDevice({ wheelCircumference })
-const dev2 = useCycplusDevice({ wheelCircumference })
+const dev1 = useCycplusDevice({ wheelCircumference: wheelCircumference1, finishDistance: finishMeters })
+const dev2 = useCycplusDevice({ wheelCircumference: wheelCircumference2, finishDistance: finishMeters })
 
 const supportHint = computed(() => ensureSupport())
 
@@ -30,28 +41,19 @@ const timeText = computed(() => formatTime(dev1.elapsedMs.value))
 
 const startSim = () => { dev1.startSim(40); dev2.startSim(35) }
 const stopSim  = () => { dev1.stopSim();    dev2.stopSim() }
-const connectBoth = async () => {
+
+async function connectOne(device: ReturnType<typeof useCycplusDevice>, displayName: string) {
   if (supportHint.value) {
     Notify.create({ type: 'negative', message: supportHint.value })
     return
   }
-
-  const r1 = await dev1.connect()
-  if (r1 === 'connected') {
-    Notify.create({ type: 'positive', message: `${name1.value || 'Гонщик 1'} підключений` })
-  } else if (r1 === 'cancelled') {
-    Notify.create({ type: 'warning', message: `Підключення ${name1.value || 'Гонщик 1'} скасовано` })
+  const r = await device.connect()
+  if (r === 'connected') {
+    Notify.create({ type: 'positive', message: `${displayName} підключений` })
+  } else if (r === 'cancelled') {
+    Notify.create({ type: 'warning', message: `Підключення ${displayName} скасовано` })
   } else {
-    Notify.create({ type: 'negative', message: `Помилка підключення ${name1.value || 'Гонщик 1'}` })
-  }
-
-  const r2 = await dev2.connect()
-  if (r2 === 'connected') {
-    Notify.create({ type: 'positive', message: `${name2.value || 'Гонщик 2'} підключений` })
-  } else if (r2 === 'cancelled') {
-    Notify.create({ type: 'warning', message: `Підключення ${name2.value || 'Гонщик 2'} скасовано` })
-  } else {
-    Notify.create({ type: 'negative', message: `Помилка підключення ${name2.value || 'Гонщик 2'}` })
+    Notify.create({ type: 'negative', message: `Помилка підключення ${displayName}` })
   }
 }
 
@@ -78,6 +80,12 @@ watch(() => dev2.distanceM.value, (dist) => {
     laps2.value.push({ atMeters: nextLap2, atMs: dev2.elapsedMs.value })
     nextLap2 += lapStepMeters.value
   }
+})
+
+watch(finishMeters, () => {
+  dev1.recalibrate()
+  dev2.recalibrate()
+  onFinishComputed()
 })
 
 const winner = ref<1 | 2 | 'tie' | null>(null)
@@ -116,36 +124,27 @@ function persistRace() {
 function onFinishComputed() {
   if (winner.value) return
 
+  const finish = finishMeters.value
   const d1 = dev1.distanceM.value
   const d2 = dev2.distanceM.value
 
-  const finished1now = d1 >= finishMeters.value && finishTime1.value == null
-  const finished2now = d2 >= finishMeters.value && finishTime2.value == null
+  if (finishTime1.value == null && d1 >= finish) finishTime1.value = dev1.elapsedMs.value
+  if (finishTime2.value == null && d2 >= finish) finishTime2.value = dev2.elapsedMs.value
 
-  if (!finished1now && !finished2now) return
-  if (finished1now) finishTime1.value = dev1.elapsedMs.value
-  if (finished2now) finishTime2.value = dev2.elapsedMs.value
+  if (finishTime1.value == null || finishTime2.value == null) return
 
-  if (finished1now && !finished2now && finishTime2.value == null) {
-    finishTime2.value = dev2.elapsedMs.value
-  }
-  if (finished2now && !finished1now && finishTime1.value == null) {
-    finishTime1.value = dev1.elapsedMs.value
-  }
+  const t1 = finishTime1.value
+  const t2 = finishTime2.value
+  const eps = 5
+  winner.value = Math.abs(t1 - t2) <= eps ? 'tie' : (t1 < t2 ? 1 : 2)
 
-  if (finished1now && finished2now) {
-    const t1 = finishTime1.value ?? 0
-    const t2 = finishTime2.value ?? 0
-    const eps = 5
-    winner.value = Math.abs(t1 - t2) <= eps ? 'tie' : (t1 < t2 ? 1 : 2)
-  } else {
-    winner.value = finished1now ? 1 : 2
-  }
+  dev1.stopClock()
+  dev2.stopClock()
 
-  stopSim()
   persistRace()
   openWinnerDialog()
 }
+
 
 watchEffect(onFinishComputed)
 
@@ -166,13 +165,13 @@ onMounted(() => {
 
 <template>
   <q-page class="flex column items-center justify-between q-px-md q-py-md">
-    <div class="container col-grow flex column items-center justify-center" >
+    <div class="container col-grow flex column items-center justify-center">
       <div class="text-center q-mb-md">
         <div class="text-h5 text-weight-medium">Gold Race: Тахометр</div>
         <div class="text-subtitle2 text-grey-7">Підключення до CYCPLUS S3</div>
       </div>
 
-      <q-banner v-if="supportHint" class="bg-negative text-white q-mb-md" dense rounded>
+      <q-banner v-if="supportHint" class="bg-negative text-white q-mб-md" dense rounded>
         {{ supportHint }}
       </q-banner>
 
@@ -185,27 +184,53 @@ onMounted(() => {
             <q-input v-model="name2" :bg-color="null" :input-style="{ color: DEV2_COLOR }" dense outlined label="Ім’я суперника 2" />
           </div>
 
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-sm-6 col-md-3">
             <q-select
-                v-model="wheelCircumference"
+                v-model="wheelCircumference1"
                 :options="WHEEL_OPTIONS"
                 emit-value map-options
-                label="Розмір колеса"
+                label="Розмір колеса (1)"
                 dense outlined standout="bg-grey-2"
+                :option-label="o => o.label || `${o} м`"
+            />
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <q-select
+                v-model="wheelCircumference2"
+                :options="WHEEL_OPTIONS"
+                emit-value map-options
+                label="Розмір колеса (2)"
+                dense outlined standout="bg-grey-2"
+                :option-label="o => o.label || `${o} м`"
             />
           </div>
 
           <div class="col-6 col-md-2">
-            <q-input v-model.number="finishMeters" type="number" min="50" step="10" dense outlined label="Фініш" suffix="м" />
+            <q-input v-model.number="rawFinish" type="number" min="200" step="50" dense outlined label="Фініш" suffix="м" />
+          </div>
+          <div class="col-6 col-sm-auto">
+            <q-btn
+                color="primary"
+                outline
+                class="full-width"
+                :label="`Підключити 1`"
+                @click="connectOne(dev1, name1 || 'Гонщик 1')"
+            />
+          </div>
+          <div class="col-6 col-sm-auto">
+            <q-btn
+                color="primary"
+                outline
+                class="full-width"
+                :label="`Підключити 2`"
+                @click="connectOne(dev2, name2 || 'Гонщик 2')"
+            />
           </div>
         </div>
 
-        <div class="row q-col-gutter-sm q-mb-md justify-end">
-          <div class="col-6 col-sm-auto"><q-btn color="primary" class="full-width" label="Підключити обидва" @click="connectBoth" /></div>
-          <div class="col-6 col-sm-auto"><q-btn color="primary" outline class="full-width" label="Підключити 1" @click="dev1.connect" /></div>
-          <div class="col-6 col-sm-auto"><q-btn color="primary" outline class="full-width" label="Підключити 2" @click="dev2.connect" /></div>
-          <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>
-          <div class="col-6 col-sm-auto"><q-btn color="negative" outline class="full-width" label="Стоп симуляції" @click="stopSim" /></div>
+        <div class="row q-col-gutter-sm q-mb-md justify-center">
+<!--          <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>-->
+<!--          <div class="col-6 col-sm-auto"><q-btn color="negative" outline class="full-width" label="Стоп симуляції" @click="stopSim" /></div>-->
           <div class="col-6 col-sm-auto"><q-btn color="warning" outline class="full-width" label="Скинути гонку" @click="resetRace" /></div>
         </div>
 
@@ -223,6 +248,8 @@ onMounted(() => {
               :angle2="dev2.angle.value"
               :color1="DEV1_COLOR"
               :color2="DEV2_COLOR"
+              :max-distance="finishMeters"
+              :step="50"
           />
 
           <div class="row q-col-gutter-md text-center indicators">
@@ -236,7 +263,7 @@ onMounted(() => {
 
             <div class="col-12 col-sm-6">
               <q-card flat bordered class="q-pa-md dev-card" :style="{ '--accent': DEV2_COLOR }">
-                <div class="text-subtitle2 text-weight-medium q-mb-xs" :style="{ color: DEV2_COLOR }">{{ name2 || 'Гонщик 2' }}</div>
+                <div class="text-subtitle2 text-weight-medium q-mб-xs" :style="{ color: DEV2_COLOR }">{{ name2 || 'Гонщик 2' }}</div>
                 <div class="text-body1">Швидкість: <b>{{ dev2.speedKmh.value.toFixed(1) }}</b> км/год</div>
                 <div class="text-body1">Відстань: <b>{{ dev2.distanceM.value.toFixed(1) }}</b> м</div>
               </q-card>

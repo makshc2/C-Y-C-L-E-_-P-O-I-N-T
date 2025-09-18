@@ -8,62 +8,115 @@ type Props = {
   color2?: string
   angleMin?: number
   angleMax?: number
-  labels?: { left: string; midLeft: string; mid: string; midRight: string; right: string }
+  maxDistance?: number
+  step?: number
+  minorPerSegment?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  color1: 'red',
-  color2: 'blue',
+  color1: '#1e88e5',
+  color2: '#e53935',
   angleMin: -120,
   angleMax: 120,
-  labels: () => ({
-    left: '200',
-    midLeft: '50',
-    mid: '100',
-    midRight: '150',
-    right: '0',
-  }),
+  maxDistance: 200,
+  step: 50,
+  minorPerSegment: 3
 })
 
-const needle1Transform = computed(() => `rotate(${props.angle1} 100 100)`)
-const needle2Transform = computed(() =>
-    props.angle2 !== undefined ? `rotate(${props.angle2} 100 100)` : undefined
+const size = 200
+const cx = 100, cy = 100
+const ringR = 90
+const majorTickIn = 16
+const majorTickOut = 14
+const minorTickIn = 14
+const minorTickOut = 16
+const labelR = 85
+
+const clamp = (v:number,a:number,b:number)=>Math.max(a,Math.min(b,v))
+const lerp  = (a:number,b:number,t:number)=>a+(b-a)*t
+const rad   = (d:number)=>d*Math.PI/180
+function tachDegToXY(deg:number, r:number){
+  const a = rad(deg - 90)
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
+}
+
+const displayMax = computed(() => {
+  const s = Math.max(1, props.step)
+  const base = Math.max(200, props.maxDistance)
+  return Math.ceil(base / s) * s
+})
+
+const majorValues = computed(() => {
+  const vals:number[] = []
+  for (let v = 0; v <= displayMax.value; v += Math.max(1, props.step)) vals.push(v)
+  return vals
+})
+
+const valueToDeg = (v:number) =>
+    lerp(props.angleMin, props.angleMax, v / displayMax.value)
+
+const majorTicks = computed(() =>
+    majorValues.value.map(v => {
+      const deg = valueToDeg(v)
+      const p1 = tachDegToXY(deg, ringR - majorTickOut)
+      const p2 = tachDegToXY(deg, ringR - majorTickIn)
+      const lbl = tachDegToXY(deg, labelR)
+      return { v, deg, p1, p2, lbl }
+    })
+)
+
+const minorTicks = computed(() => {
+  const res:{p1:{x:number,y:number}, p2:{x:number,y:number}}[] = []
+  const m = Math.max(0, props.minorPerSegment)
+  if (!m) return res
+  for (let i = 0; i < majorValues.value.length - 1; i++) {
+    const vFrom = majorValues.value[i]
+    const vTo   = majorValues.value[i + 1]
+    for (let k = 1; k <= m; k++) {
+      const v = lerp(vFrom, vTo, k / (m + 1))
+      const deg = valueToDeg(v)
+      const p1 = tachDegToXY(deg, ringR - minorTickOut)
+      const p2 = tachDegToXY(deg, ringR - minorTickIn)
+      res.push({ p1, p2 })
+    }
+  }
+  return res
+})
+
+const n1 = computed(() => `rotate(${clamp(props.angle1, props.angleMin, props.angleMax)} ${cx} ${cy})`)
+const n2 = computed(() =>
+    props.angle2 === undefined ? undefined :
+        `rotate(${clamp(props.angle2, props.angleMin, props.angleMax)} ${cx} ${cy})`
 )
 </script>
 
 <template>
   <div class="tachometer">
     <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" aria-label="Tachometer">
+      <circle :cx="cx" :cy="cy" :r="ringR" stroke="#cfcfcf" stroke-width="6" fill="none" />
 
-      <circle cx="100" cy="100" r="90" stroke="#ccc" stroke-width="4" fill="none" />
-
-      <g stroke="black">
-        <line x1="100" y1="10" x2="100" y2="20" :transform="`rotate(${angleMin} 100 100)`" />
-        <line x1="100" y1="10" x2="100" y2="20" :transform="`rotate(${(angleMin+angleMax)/2 - 60} 100 100)`" />
-        <line x1="100" y1="10" x2="100" y2="20" transform="rotate(0 100 100)" />
-        <line x1="100" y1="10" x2="100" y2="20" :transform="`rotate(${60} 100 100)`" />
-        <line x1="100" y1="10" x2="100" y2="20" :transform="`rotate(${angleMax} 100 100)`" />
+      <g stroke="#000" stroke-width="2">
+        <line
+            v-for="t in majorTicks" :key="'maj-'+t.v"
+            :x1="t.p1.x" :y1="t.p1.y" :x2="t.p2.x" :y2="t.p2.y"
+        />
       </g>
 
-      <g font-size="10" text-anchor="middle">
-        <text x="40" y="115" :transform="`rotate(${angleMin} 100 100)`">{{ labels.left }}</text>
-        <text x="65" y="55" :transform="`rotate(-30 100 100)`">{{ labels.midLeft }}</text>
-        <text x="100" y="40" transform="rotate(0 100 100)">{{ labels.mid }}</text>
-        <text x="135" y="55" :transform="`rotate(30 100 100)`">{{ labels.midRight }}</text>
-        <text x="160" y="115" :transform="`rotate(${angleMax} 100 100)`">{{ labels.right }}</text>
+      <g stroke="#888" stroke-width="1">
+        <line
+            v-for="(t, i) in minorTicks" :key="'min-'+i"
+            :x1="t.p1.x" :y1="t.p1.y" :x2="t.p2.x" :y2="t.p2.y"
+        />
       </g>
 
-      <line x1="100" y1="100" x2="100" y2="20" :transform="needle1Transform" :stroke="color1" stroke-width="4" />
-      <line
-          v-if="needle2Transform"
-          x1="100"
-          y1="100"
-          x2="100"
-          y2="20"
-          :transform="needle2Transform"
-          :stroke="color2"
-          stroke-width="4"
-      />
+      <g font-size="10" text-anchor="middle" fill="#222">
+        <text v-for="t in majorTicks" :key="'lbl-'+t.v" :x="t.lbl.x" :y="t.lbl.y">
+          {{ t.v }}
+        </text>
+      </g>
+
+      <line x1="100" y1="100" x2="100" y2="28" :transform="n1" :stroke="color1" stroke-width="4" />
+      <line v-if="n2" x1="100" y1="100" x2="100" y2="28" :transform="n2" :stroke="color2" stroke-width="4" />
     </svg>
   </div>
 </template>
@@ -71,17 +124,10 @@ const needle2Transform = computed(() =>
 <style scoped>
 .tachometer {
   width: 100%;
-  max-width: 300px;
-  aspect-ratio: 1 / 1;
+  max-width: 350px;
+  aspect-ratio: 1/1;
   display: grid;
   place-items: center;
 }
-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-@media (max-width: 360px) {
-  .tachometer { max-width: 300px; }
-}
+svg { width: 100%; height: auto; display: block; }
 </style>

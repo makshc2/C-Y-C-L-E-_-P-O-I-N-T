@@ -2,6 +2,7 @@ import { ref, type Ref } from 'vue'
 
 type UseCycplusOptions = {
     wheelCircumference: Ref<number>
+    finishDistance: Ref<number>
 }
 
 type CscCharacteristic = BluetoothRemoteGATTCharacteristic
@@ -33,10 +34,16 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
             rafId = null
         }
     }
+
     function setAngleByDistance(meters: number) {
-        const capped = Math.min(Math.max(meters, 0), 200)
-        targetAngle.value = -120 + (capped / 200) * 240
+        const maxDist = Math.max(1, opts.finishDistance.value) // захист від нуля
+        const capped = Math.min(Math.max(meters, 0), maxDist)
+        targetAngle.value = -120 + (capped / maxDist) * 240
         if (rafId == null) rafId = requestAnimationFrame(animateNeedle)
+    }
+
+    function recalibrate() {
+        setAngleByDistance(distanceM.value)
     }
 
     let startTs = 0
@@ -61,7 +68,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         status.value = 'Симуляція…'
         if (elapsedMs.value === 0) startElapsed()
         simTimer = window.setInterval(() => {
-            distanceM.value = Math.min(10000, distanceM.value + stepMetersPerTick)
+            distanceM.value = Math.min(1000000, distanceM.value + stepMetersPerTick)
             const kmh = (stepMetersPerTick / (tickMs / 1000)) * 3.6
             speedKmh.value = kmh
             setAngleByDistance(distanceM.value)
@@ -74,40 +81,39 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
             status.value = 'Зупинено'
         }
     }
-        async function connect(): Promise<'connected' | 'cancelled' | 'error'> {
-            try {
-                status.value = 'Запит пристрою…'
 
-                const dev = await navigator.bluetooth.requestDevice({
-                    // filters: [{ namePrefix: 'CYCPLUS' }],
-                    acceptAllDevices: true,
-                    optionalServices: [0x1816]
-                })
-                device = dev
-                device.addEventListener('gattserverdisconnected', onDisconnected)
+    async function connect(): Promise<'connected' | 'cancelled' | 'error'> {
+        try {
+            status.value = 'Запит пристрою…'
+            const dev = await navigator.bluetooth.requestDevice({
+                acceptAllDevices: true,
+                optionalServices: [0x1816]
+            })
+            device = dev
+            device.addEventListener('gattserverdisconnected', onDisconnected)
 
-                status.value = 'Підключення…'
-                const server = await device.gatt!.connect()
-                const service = await server.getPrimaryService(0x1816)
-                characteristic = await service.getCharacteristic(0x2A5B)
+            status.value = 'Підключення…'
+            const server = await device.gatt!.connect()
+            const service = await server.getPrimaryService(0x1816)
+            characteristic = await service.getCharacteristic(0x2A5B)
 
-                await characteristic.startNotifications()
-                characteristic.addEventListener('characteristicvaluechanged', onCscNotification as any)
+            await characteristic.startNotifications()
+            characteristic.addEventListener('characteristicvaluechanged', onCscNotification as any)
 
-                status.value = 'Підключено'
-                if (elapsedMs.value === 0) startElapsed()
-                return 'connected'
-            } catch (e: any) {
-                if (e?.name === 'NotFoundError' || e?.message?.includes('cancelled')) {
-                    status.value = 'Скасовано користувачем'
-                    return 'cancelled'
-                }
-                console.error('BLE error:', e)
-                status.value = '❌ Помилка підключення'
-                return 'error'
+            status.value = 'Підключено'
+            if (elapsedMs.value === 0) startElapsed()
+            setAngleByDistance(distanceM.value)
+            return 'connected'
+        } catch (e: any) {
+            if (e?.name === 'NotFoundError' || e?.message?.includes('cancelled')) {
+                status.value = 'Скасовано користувачем'
+                return 'cancelled'
             }
+            console.error('BLE error:', e)
+            status.value = '❌ Помилка підключення'
+            return 'error'
         }
-
+    }
 
     function onDisconnected() {
         status.value = 'Роз’єднано'
@@ -120,7 +126,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         if (!wheelPresent) return
 
         const cumulativeRevs = dv.getUint32(1, true)
-        const lastWheelEventTime = dv.getUint16(5, true) // 1/1024 сек
+        const lastWheelEventTime = dv.getUint16(5, true)
 
         if (lastTime1024 !== 0 && cumulativeRevs !== lastRevs) {
             const deltaRevs = cumulativeRevs - lastRevs
@@ -152,8 +158,14 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         lastTime1024 = 0
     }
 
+    function stopClock() {
+        stopSim()
+        stopElapsed()
+        status.value = 'Зупинено'
+    }
+
     return {
         angle, targetAngle, speedKmh, distanceM, elapsedMs, status,
-        connect, startSim, stopSim, reset
+        connect, startSim, stopSim, reset, recalibrate, stopClock
     }
 }
