@@ -160,11 +160,6 @@ onMounted(() => {
 <template>
   <q-page class="flex column items-center justify-between q-px-md q-py-md">
     <div class="container col-grow flex column items-center justify-center">
-      <div class="text-center q-mb-md">
-        <div class="text-h5 text-weight-medium">Gold Race: Тахометр</div>
-        <div class="text-subtitle2 text-grey-7">Підключення до CYCPLUS S3</div>
-      </div>
-
       <q-banner v-if="supportHint" class="bg-negative text-white q-mb-md" dense rounded>
         {{ supportHint }}
       </q-banner>
