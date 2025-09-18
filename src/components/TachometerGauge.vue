@@ -23,14 +23,14 @@ const props = withDefaults(defineProps<Props>(), {
   minorPerSegment: 3
 })
 
-const size = 200
+const size = 250
 const cx = 100, cy = 100
-const ringR = 90
-const majorTickIn = 16
+const ringR = 95
+const majorTickIn = 20
 const majorTickOut = 14
-const minorTickIn = 14
-const minorTickOut = 16
-const labelR = 85
+const minorTickIn = 16
+const minorTickOut = 14
+const labelR = ringR - (majorTickIn + 12)
 
 const clamp = (v:number,a:number,b:number)=>Math.max(a,Math.min(b,v))
 const lerp  = (a:number,b:number,t:number)=>a+(b-a)*t
@@ -109,7 +109,7 @@ const n2 = computed(() =>
         />
       </g>
 
-      <g font-size="10" text-anchor="middle" fill="#222">
+      <g font-size="7" text-anchor="middle" fill="#222">
         <text v-for="t in majorTicks" :key="'lbl-'+t.v" :x="t.lbl.x" :y="t.lbl.y">
           {{ t.v }}
         </text>
@@ -129,5 +129,9 @@ const n2 = computed(() =>
   display: grid;
   place-items: center;
 }
-svg { width: 100%; height: auto; display: block; }
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 </style>
