@@ -37,10 +37,11 @@ const dev2 = useCycplusDevice({ wheelCircumference: wheelCircumference2, finishD
 
 const supportHint = computed(() => ensureSupport())
 
-const timeText = computed(() => formatTime(dev1.elapsedMs.value))
+const raceElapsedMs = computed(() => Math.max(dev1.elapsedMs.value, dev2.elapsedMs.value))
+const timeText = computed(() => formatTime(raceElapsedMs.value))
 
-const startSim = () => { dev1.startSim(40); dev2.startSim(35) }
-const stopSim  = () => { dev1.stopSim();    dev2.stopSim() }
+// const startSim = () => { dev1.startSim(40); dev2.startSim(35) }
+// const stopSim  = () => { dev1.stopSim();    dev2.stopSim() }
 
 async function connectOne(device: ReturnType<typeof useCycplusDevice>, displayName: string) {
   if (supportHint.value) {
@@ -123,28 +124,21 @@ function persistRace() {
 
 function onFinishComputed() {
   if (winner.value) return
-
   const finish = finishMeters.value
   const d1 = dev1.distanceM.value
   const d2 = dev2.distanceM.value
-
   if (finishTime1.value == null && d1 >= finish) finishTime1.value = dev1.elapsedMs.value
   if (finishTime2.value == null && d2 >= finish) finishTime2.value = dev2.elapsedMs.value
-
   if (finishTime1.value == null || finishTime2.value == null) return
-
   const t1 = finishTime1.value
   const t2 = finishTime2.value
   const eps = 5
   winner.value = Math.abs(t1 - t2) <= eps ? 'tie' : (t1 < t2 ? 1 : 2)
-
   dev1.stopClock()
   dev2.stopClock()
-
   persistRace()
   openWinnerDialog()
 }
-
 
 watchEffect(onFinishComputed)
 
@@ -171,7 +165,7 @@ onMounted(() => {
         <div class="text-subtitle2 text-grey-7">Підключення до CYCPLUS S3</div>
       </div>
 
-      <q-banner v-if="supportHint" class="bg-negative text-white q-mб-md" dense rounded>
+      <q-banner v-if="supportHint" class="bg-negative text-white q-mb-md" dense rounded>
         {{ supportHint }}
       </q-banner>
 
@@ -227,8 +221,8 @@ onMounted(() => {
             />
           </div>
         </div>
+        <div class="row q-col-gutter-sm q-mб-md justify-center">
 
-        <div class="row q-col-gutter-sm q-mb-md justify-center">
 <!--          <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>-->
 <!--          <div class="col-6 col-sm-auto"><q-btn color="negative" outline class="full-width" label="Стоп симуляції" @click="stopSim" /></div>-->
           <div class="col-6 col-sm-auto"><q-btn color="warning" outline class="full-width" label="Скинути гонку" @click="resetRace" /></div>

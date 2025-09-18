@@ -36,7 +36,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     function setAngleByDistance(meters: number) {
-        const maxDist = Math.max(1, opts.finishDistance.value) // захист від нуля
+        const maxDist = Math.max(1, opts.finishDistance.value)
         const capped = Math.min(Math.max(meters, 0), maxDist)
         targetAngle.value = -120 + (capped / maxDist) * 240
         if (rafId == null) rafId = requestAnimationFrame(animateNeedle)
@@ -62,25 +62,25 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         }
     }
 
-    let simTimer: number | null = null
-    function startSim(stepMetersPerTick = 40, tickMs = 1000) {
-        stopSim()
-        status.value = 'Симуляція…'
-        if (elapsedMs.value === 0) startElapsed()
-        simTimer = window.setInterval(() => {
-            distanceM.value = Math.min(1000000, distanceM.value + stepMetersPerTick)
-            const kmh = (stepMetersPerTick / (tickMs / 1000)) * 3.6
-            speedKmh.value = kmh
-            setAngleByDistance(distanceM.value)
-        }, tickMs)
-    }
-    function stopSim() {
-        if (simTimer) {
-            clearInterval(simTimer)
-            simTimer = null
-            status.value = 'Зупинено'
-        }
-    }
+    // let simTimer: number | null = null
+    // function startSim(stepMetersPerTick = 40, tickMs = 1000) {
+    //     stopSim()
+    //     status.value = 'Симуляція…'
+    //     if (elapsedMs.value === 0) startElapsed()
+    //     simTimer = window.setInterval(() => {
+    //         distanceM.value = Math.min(1000000, distanceM.value + stepMetersPerTick)
+    //         const kmh = (stepMetersPerTick / (tickMs / 1000)) * 3.6
+    //         speedKmh.value = kmh
+    //         setAngleByDistance(distanceM.value)
+    //     }, tickMs)
+    // }
+    // function stopSim() {
+    //     if (simTimer) {
+    //         clearInterval(simTimer)
+    //         simTimer = null
+    //         status.value = 'Зупинено'
+    //     }
+    // }
 
     async function connect(): Promise<'connected' | 'cancelled' | 'error'> {
         try {
@@ -100,8 +100,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
             await characteristic.startNotifications()
             characteristic.addEventListener('characteristicvaluechanged', onCscNotification as any)
 
-            status.value = 'Підключено'
-            if (elapsedMs.value === 0) startElapsed()
+            status.value = 'Підключено, очікую дані…'
             setAngleByDistance(distanceM.value)
             return 'connected'
         } catch (e: any) {
@@ -117,6 +116,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
 
     function onDisconnected() {
         status.value = 'Роз’єднано'
+        stopElapsed()
     }
 
     function onCscNotification(event: Event) {
@@ -131,12 +131,10 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         if (lastTime1024 !== 0 && cumulativeRevs !== lastRevs) {
             const deltaRevs = cumulativeRevs - lastRevs
             const deltaTimeSec = ((lastWheelEventTime - lastTime1024 + 65536) % 65536) / 1024
-
-            const wheelCirc = opts.wheelCircumference.value // м
+            const wheelCirc = opts.wheelCircumference.value
             const instSpeedKmh = (deltaRevs * wheelCirc) / Math.max(1e-6, deltaTimeSec) * 3.6
             speedKmh.value = instSpeedKmh
             distanceM.value += deltaRevs * wheelCirc
-
             setAngleByDistance(distanceM.value)
             if (elapsedMs.value === 0) startElapsed()
         }
@@ -146,7 +144,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     function reset() {
-        stopSim()
+        // stopSim()
         stopElapsed()
         speedKmh.value = 0
         distanceM.value = 0
@@ -159,13 +157,14 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     function stopClock() {
-        stopSim()
+        // stopSim()
         stopElapsed()
         status.value = 'Зупинено'
     }
 
     return {
         angle, targetAngle, speedKmh, distanceM, elapsedMs, status,
-        connect, startSim, stopSim, reset, recalibrate, stopClock
+        connect, reset, recalibrate, stopClock,
+        // startSim, stopSim
     }
 }
