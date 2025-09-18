@@ -9,7 +9,7 @@ const isActive = (path: string) => route.path === path
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-grey-2 text-dark">
       <q-toolbar>
-
+        <img class="logo" src="../src/assets/img/cycle_point.jpg" alt="logo">
         <q-toolbar-title>Cycle Point App</q-toolbar-title>
 
         <q-space />
@@ -36,3 +36,12 @@ const isActive = (path: string) => route.path === path
     </q-page-container>
   </q-layout>
 </template>
+
+<style scoped lang="scss">
+.logo{
+  width: 40px;
+  height: 40px;
+}
+
+
+</style>
