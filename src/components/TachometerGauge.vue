@@ -40,15 +40,27 @@ function tachDegToXY(deg:number, r:number){
   return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
 }
 
+// Адаптивний крок залежно від максимальної відстані
+const adaptiveStep = computed(() => {
+  const maxDist = Math.max(200, props.maxDistance)
+  if (maxDist <= 500) return 50
+  if (maxDist <= 1000) return 100
+  if (maxDist <= 2000) return 200
+  if (maxDist <= 3000) return 300
+  if (maxDist <= 5000) return 500
+  return 1000
+})
+
 const displayMax = computed(() => {
-  const s = Math.max(1, props.step)
   const base = Math.max(200, props.maxDistance)
-  return Math.ceil(base / s) * s
+  const step = adaptiveStep.value
+  return Math.ceil(base / step) * step
 })
 
 const majorValues = computed(() => {
   const vals:number[] = []
-  for (let v = 0; v <= displayMax.value; v += Math.max(1, props.step)) vals.push(v)
+  const step = adaptiveStep.value
+  for (let v = 0; v <= displayMax.value; v += step) vals.push(v)
   return vals
 })
 
@@ -65,9 +77,18 @@ const majorTicks = computed(() =>
     })
 )
 
+// Адаптивна кількість проміжних позначок
+const adaptiveMinorPerSegment = computed(() => {
+  const step = adaptiveStep.value
+  if (step <= 50) return 3
+  if (step <= 100) return 2
+  if (step <= 200) return 1
+  return 0
+})
+
 const minorTicks = computed(() => {
   const res:{p1:{x:number,y:number}, p2:{x:number,y:number}}[] = []
-  const m = Math.max(0, props.minorPerSegment)
+  const m = adaptiveMinorPerSegment.value
   if (!m) return res
   for (let i = 0; i < majorValues.value.length - 1; i++) {
     const vFrom = majorValues.value[i]
@@ -82,6 +103,23 @@ const minorTicks = computed(() => {
   }
   return res
 })
+
+// Адаптивний розмір шрифту
+const fontSize = computed(() => {
+  const step = adaptiveStep.value
+  if (step <= 50) return 7
+  if (step <= 100) return 6
+  if (step <= 200) return 5
+  return 4
+})
+
+// Форматування чисел для кращого відображення
+const formatValue = (value: number): string => {
+  if (value >= 1000) {
+    return `${Math.round(value / 100) / 10}K`
+  }
+  return value.toString()
+}
 
 const n1 = computed(() => `rotate(${clamp(props.angle1, props.angleMin, props.angleMax)} ${cx} ${cy})`)
 const n2 = computed(() =>
@@ -109,9 +147,9 @@ const n2 = computed(() =>
         />
       </g>
 
-      <g font-size="7" text-anchor="middle" fill="#222">
+      <g :font-size="fontSize" text-anchor="middle" fill="#222">
         <text v-for="t in majorTicks" :key="'lbl-'+t.v" :x="t.lbl.x" :y="t.lbl.y">
-          {{ t.v }}
+          {{ formatValue(t.v) }}
         </text>
       </g>
 

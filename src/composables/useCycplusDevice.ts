@@ -98,17 +98,18 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
             characteristic = await service.getCharacteristic(0x2A5B)
 
             await characteristic.startNotifications()
-            characteristic.addEventListener('characteristicvaluechanged', onCscNotification as any)
+            characteristic.addEventListener('characteristicvaluechanged', onCscNotification as EventListener)
 
             status.value = 'Підключено, очікую дані…'
             setAngleByDistance(distanceM.value)
             return 'connected'
-        } catch (e: any) {
-            if (e?.name === 'NotFoundError' || e?.message?.includes('cancelled')) {
+        } catch (e: unknown) {
+            const error = e as Error
+            if (error?.name === 'NotFoundError' || error?.message?.includes('cancelled')) {
                 status.value = 'Скасовано користувачем'
                 return 'cancelled'
             }
-            console.error('BLE error:', e)
+            console.error('BLE error:', error)
             status.value = '❌ Помилка підключення'
             return 'error'
         }
@@ -120,7 +121,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     function onCscNotification(event: Event) {
-        const dv = (event as any).target.value as DataView
+        const dv = (event.target as BluetoothRemoteGATTCharacteristic).value as DataView
         const flags = dv.getUint8(0)
         const wheelPresent = (flags & 0x01) !== 0
         if (!wheelPresent) return

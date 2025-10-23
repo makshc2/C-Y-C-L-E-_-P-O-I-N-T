@@ -195,7 +195,7 @@ onMounted(() => {
           </div>
 
           <div class="col-6 col-md-2">
-            <q-input v-model.number="rawFinish" type="number" min="200" step="50" dense outlined label="Фініш" suffix="м" />
+            <q-input v-model.number="rawFinish" type="number" min="200" max="5000" step="50" dense outlined label="Фініш" suffix="м" />
           </div>
           <div class="col-6 col-sm-auto">
             <q-btn
@@ -216,7 +216,7 @@ onMounted(() => {
             />
           </div>
         </div>
-        <div class="row q-col-gutter-sm q-mб-md justify-center">
+        <div class="row q-col-gutter-sm q-mb-md justify-center">
 
 <!--          <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>-->
 <!--          <div class="col-6 col-sm-auto"><q-btn color="negative" outline class="full-width" label="Стоп симуляції" @click="stopSim" /></div>-->
@@ -252,7 +252,7 @@ onMounted(() => {
 
             <div class="col-12 col-sm-6">
               <q-card flat bordered class="q-pa-md dev-card" :style="{ '--accent': DEV2_COLOR }">
-                <div class="text-subtitle2 text-weight-medium q-mб-xs" :style="{ color: DEV2_COLOR }">{{ name2 || 'Гонщик 2' }}</div>
+                <div class="text-subtitle2 text-weight-medium q-mb-xs" :style="{ color: DEV2_COLOR }">{{ name2 || 'Гонщик 2' }}</div>
                 <div class="text-body1">Швидкість: <b>{{ dev2.speedKmh.value.toFixed(1) }}</b> км/год</div>
                 <div class="text-body1">Відстань: <b>{{ dev2.distanceM.value.toFixed(1) }}</b> м</div>
               </q-card>
