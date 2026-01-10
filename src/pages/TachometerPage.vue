@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect, onMounted } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import useCycplusDevice from '../composables/useCycplusDevice'
 import ensureSupport from '../composables/useWebBluetoothSupport'
 import TachometerGauge from '../components/TachometerGauge.vue'
@@ -32,8 +32,16 @@ const autoRestartSeconds = ref<number>(5)
 const name1 = ref('Гонщик 1')
 const name2 = ref('Гонщик 2')
 
-const dev1 = useCycplusDevice({ wheelCircumference: wheelCircumference1, finishDistance: finishMeters })
-const dev2 = useCycplusDevice({ wheelCircumference: wheelCircumference2, finishDistance: finishMeters })
+const dev1 = useCycplusDevice({ 
+  wheelCircumference: wheelCircumference1, 
+  finishDistance: finishMeters,
+  deviceNamePrefix: ref('CYCPLUS')
+})
+const dev2 = useCycplusDevice({ 
+  wheelCircumference: wheelCircumference2, 
+  finishDistance: finishMeters,
+  deviceNamePrefix: ref('CYCPLUS')
+})
 
 const supportHint = computed(() => ensureSupport())
 
@@ -89,13 +97,23 @@ watch(finishMeters, () => {
   onFinishComputed()
 })
 
+const isRaceStarted = ref<boolean>(false)
+const isRaceFinished = ref<boolean>(false)
+
+const finishReached1 = ref<boolean>(false)
+const finishReached2 = ref<boolean>(false)
+
 const winner = ref<1 | 2 | 'tie' | null>(null)
 const showWinner = ref(false)
 const finishTime1 = ref<number | null>(null)
 const finishTime2 = ref<number | null>(null)
 let autoRestartTimer: number | null = null
 
+let dialogWasShown = false
+
 function openWinnerDialog() {
+  if (dialogWasShown) return
+  dialogWasShown = true
   showWinner.value = true
   if (autoRestartEnabled.value) {
     if (autoRestartTimer) clearTimeout(autoRestartTimer)
@@ -123,37 +141,116 @@ function persistRace() {
 }
 
 function onFinishComputed() {
-  if (winner.value) return
+  if (!isRaceStarted.value || isRaceFinished.value) return
   const finish = finishMeters.value
   const d1 = dev1.distanceM.value
   const d2 = dev2.distanceM.value
-  if (finishTime1.value == null && d1 >= finish) finishTime1.value = dev1.elapsedMs.value
-  if (finishTime2.value == null && d2 >= finish) finishTime2.value = dev2.elapsedMs.value
-  if (finishTime1.value == null || finishTime2.value == null) return
-  const t1 = finishTime1.value
-  const t2 = finishTime2.value
-  const eps = 5
-  winner.value = Math.abs(t1 - t2) <= eps ? 'tie' : (t1 < t2 ? 1 : 2)
-  dev1.stopClock()
-  dev2.stopClock()
-  persistRace()
-  openWinnerDialog()
+  
+  if (!finishReached1.value && d1 >= finish) {
+    finishReached1.value = true
+    finishTime1.value = dev1.elapsedMs.value
+    dev1.stopDataProcessing()
+    if (!showWinner.value) {
+      winner.value = 1
+      openWinnerDialog()
+    }
+  }
+  
+  if (!finishReached2.value && d2 >= finish) {
+    finishReached2.value = true
+    finishTime2.value = dev2.elapsedMs.value
+    dev2.stopDataProcessing()
+    if (!showWinner.value) {
+      winner.value = 2
+      openWinnerDialog()
+    }
+  }
+  
+  if (finishReached1.value && finishReached2.value && !isRaceFinished.value) {
+    const t1 = finishTime1.value!
+    const t2 = finishTime2.value!
+    const eps = 5
+    if (Math.abs(t1 - t2) <= eps) {
+      winner.value = 'tie'
+    } else {
+      winner.value = t1 < t2 ? 1 : 2
+    }
+    isRaceFinished.value = true
+    dev1.stopClock()
+    dev2.stopClock()
+    if (showWinner.value) {
+      showWinner.value = false
+      dialogWasShown = false
+    }
+    persistRace()
+    openWinnerDialog()
+  }
 }
 
 watchEffect(onFinishComputed)
 
-function resetRace() {
+function startRace() {
+  if (isRaceStarted.value) return
+  isRaceStarted.value = true
+  isRaceFinished.value = false
+  dev1.startClock()
+  dev2.startClock()
+}
+
+function finishRace() {
+  if (!isRaceStarted.value || isRaceFinished.value) return
+  isRaceFinished.value = true
+  dev1.stopClock()
+  dev2.stopClock()
+}
+
+async function resetRace() {
+  await dev1.disconnect()
+  await dev2.disconnect()
   dev1.reset()
   dev2.reset()
   resetLaps()
+  isRaceStarted.value = false
+  isRaceFinished.value = false
+  finishReached1.value = false
+  finishReached2.value = false
   winner.value = null
   finishTime1.value = null
   finishTime2.value = null
+  showWinner.value = false
+  dialogWasShown = false
   if (autoRestartTimer) { clearTimeout(autoRestartTimer); autoRestartTimer = null }
 }
 
+let connectionCheckInterval: number | null = null
+
 onMounted(() => {
   resetLaps()
+  
+  connectionCheckInterval = window.setInterval(() => {
+    if (isRaceStarted.value && !isRaceFinished.value) {
+      if (!dev1.isConnected() && dev1.deviceName.value) {
+        dev1.reconnect()
+      }
+      if (!dev2.isConnected() && dev2.deviceName.value) {
+        dev2.reconnect()
+      }
+    } else {
+      if (dev1.isConnected() && dev1.status.value === 'Роз\'єднано') {
+        dev1.status.value = 'Підключено, очікую дані…'
+      }
+      if (dev2.isConnected() && dev2.status.value === 'Роз\'єднано') {
+        dev2.status.value = 'Підключено, очікую дані…'
+      }
+    }
+  }, 2000)
+})
+
+onUnmounted(() => {
+  if (connectionCheckInterval) {
+    clearInterval(connectionCheckInterval)
+    connectionCheckInterval = null
+  }
 })
 </script>
 
@@ -217,10 +314,36 @@ onMounted(() => {
           </div>
         </div>
         <div class="row q-col-gutter-sm q-mb-md justify-center">
-
-<!--          <div class="col-6 col-sm-auto"><q-btn color="positive" class="full-width" label="Старт симуляції" @click="startSim" /></div>-->
-<!--          <div class="col-6 col-sm-auto"><q-btn color="negative" outline class="full-width" label="Стоп симуляції" @click="stopSim" /></div>-->
-          <div class="col-6 col-sm-auto"><q-btn color="warning" outline class="full-width" label="Скинути гонку" @click="resetRace" /></div>
+          <div class="col-6 col-sm-auto">
+            <q-btn 
+              color="positive" 
+              class="full-width" 
+              label="Старт" 
+              icon="play_arrow"
+              :disable="isRaceStarted && !isRaceFinished"
+              @click="startRace" 
+            />
+          </div>
+          <div class="col-6 col-sm-auto">
+            <q-btn 
+              color="negative" 
+              outline 
+              class="full-width" 
+              label="Фініш" 
+              icon="stop"
+              :disable="!isRaceStarted || isRaceFinished"
+              @click="finishRace" 
+            />
+          </div>
+          <div class="col-6 col-sm-auto">
+            <q-btn 
+              color="warning" 
+              outline 
+              class="full-width" 
+              label="Скинути гонку" 
+              @click="resetRace" 
+            />
+          </div>
         </div>
 
         <q-separator spaced />
@@ -245,6 +368,9 @@ onMounted(() => {
             <div class="col-12 col-sm-6">
               <q-card flat bordered class="q-pa-md dev-card" :style="{ '--accent': DEV1_COLOR }">
                 <div class="text-subtitle2 text-weight-medium q-mb-xs" :style="{ color: DEV1_COLOR }">{{ name1 || 'Гонщик 1' }}</div>
+                <div v-if="dev1.deviceName.value" class="text-caption text-grey-7 q-mb-xs">
+                  <q-icon name="bluetooth" size="xs" /> {{ dev1.deviceName.value }}
+                </div>
                 <div class="text-body1">Швидкість: <b>{{ dev1.speedKmh.value.toFixed(1) }}</b> км/год</div>
                 <div class="text-body1">Відстань: <b>{{ dev1.distanceM.value.toFixed(1) }}</b> м</div>
               </q-card>
@@ -253,6 +379,9 @@ onMounted(() => {
             <div class="col-12 col-sm-6">
               <q-card flat bordered class="q-pa-md dev-card" :style="{ '--accent': DEV2_COLOR }">
                 <div class="text-subtitle2 text-weight-medium q-mb-xs" :style="{ color: DEV2_COLOR }">{{ name2 || 'Гонщик 2' }}</div>
+                <div v-if="dev2.deviceName.value" class="text-caption text-grey-7 q-mb-xs">
+                  <q-icon name="bluetooth" size="xs" /> {{ dev2.deviceName.value }}
+                </div>
                 <div class="text-body1">Швидкість: <b>{{ dev2.speedKmh.value.toFixed(1) }}</b> км/год</div>
                 <div class="text-body1">Відстань: <b>{{ dev2.distanceM.value.toFixed(1) }}</b> м</div>
               </q-card>
@@ -265,13 +394,15 @@ onMounted(() => {
             <div class="col-12 col-sm-6">
               <q-banner rounded dense class="q-pa-sm bg-grey-2">
                 <b :style="{ color: DEV1_COLOR }">{{ name1 || 'Гонщик 1' }}:</b>
-                {{ dev1.status.value || 'Очікування…' }}
+                <span v-if="dev1.deviceName.value" class="q-ml-xs text-weight-medium">{{ dev1.deviceName.value }}</span>
+                <span class="q-ml-xs">{{ dev1.status.value || 'Очікування…' }}</span>
               </q-banner>
             </div>
             <div class="col-12 col-sm-6">
               <q-banner rounded dense class="q-pa-sm bg-grey-2">
                 <b :style="{ color: DEV2_COLOR }">{{ name2 || 'Гонщик 2' }}:</b>
-                {{ dev2.status.value || 'Очікування…' }}
+                <span v-if="dev2.deviceName.value" class="q-ml-xs text-weight-medium">{{ dev2.deviceName.value }}</span>
+                <span class="q-ml-xs">{{ dev2.status.value || 'Очікування…' }}</span>
               </q-banner>
             </div>
           </div>
