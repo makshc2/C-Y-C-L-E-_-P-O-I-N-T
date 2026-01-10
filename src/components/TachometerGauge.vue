@@ -40,7 +40,6 @@ function tachDegToXY(deg:number, r:number){
   return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
 }
 
-// Адаптивний крок залежно від максимальної відстані
 const adaptiveStep = computed(() => {
   const maxDist = Math.max(200, props.maxDistance)
   if (maxDist <= 500) return 50
@@ -77,7 +76,6 @@ const majorTicks = computed(() =>
     })
 )
 
-// Адаптивна кількість проміжних позначок
 const adaptiveMinorPerSegment = computed(() => {
   const step = adaptiveStep.value
   if (step <= 50) return 3
@@ -104,7 +102,6 @@ const minorTicks = computed(() => {
   return res
 })
 
-// Адаптивний розмір шрифту
 const fontSize = computed(() => {
   const step = adaptiveStep.value
   if (step <= 50) return 7
@@ -113,7 +110,6 @@ const fontSize = computed(() => {
   return 4
 })
 
-// Форматування чисел для кращого відображення
 const formatValue = (value: number): string => {
   if (value >= 1000) {
     return `${Math.round(value / 100) / 10}K`

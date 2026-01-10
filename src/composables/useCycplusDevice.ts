@@ -68,26 +68,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         }
     }
 
-    // let simTimer: number | null = null
-    // function startSim(stepMetersPerTick = 40, tickMs = 1000) {
-    //     stopSim()
-    //     status.value = 'Симуляція…'
-    //     if (elapsedMs.value === 0) startElapsed()
-    //     simTimer = window.setInterval(() => {
-    //         distanceM.value = Math.min(1000000, distanceM.value + stepMetersPerTick)
-    //         const kmh = (stepMetersPerTick / (tickMs / 1000)) * 3.6
-    //         speedKmh.value = kmh
-    //         setAngleByDistance(distanceM.value)
-    //     }, tickMs)
-    // }
-    // function stopSim() {
-    //     if (simTimer) {
-    //         clearInterval(simTimer)
-    //         simTimer = null
-    //         status.value = 'Зупинено'
-    //     }
-    // }
-
     async function connect(): Promise<'connected' | 'cancelled' | 'error'> {
         try {
             if (device && device.gatt && device.gatt.connected) {
@@ -165,10 +145,15 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     async function reconnect(): Promise<boolean> {
         if (!savedDeviceId || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
             if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-                status.value = 'Не вдалося перепідключитися'
+                status.value = 'Не вдалося перепідключитися. Натисніть "Підключити" для повторного підключення'
                 deviceName.value = ''
                 savedDeviceId = null
             }
+            return false
+        }
+
+        if (!device || !device.gatt) {
+            status.value = 'Пристрій недоступний. Натисніть "Підключити" для повторного підключення'
             return false
         }
 
@@ -176,52 +161,7 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
             reconnectAttempts++
             status.value = `Перепідключення... (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`
             
-            if (device && device.gatt) {
-                try {
-                    const server = await device.gatt.connect()
-                    
-                    if (server.connected) {
-                        const service = await server.getPrimaryService(0x1816)
-                        characteristic = await service.getCharacteristic(0x2A5B)
-
-                        await characteristic.startNotifications()
-                        characteristic.addEventListener('characteristicvaluechanged', onCscNotification as EventListener)
-
-                        status.value = 'Перепідключено'
-                        reconnectAttempts = 0
-                        setAngleByDistance(distanceM.value)
-                        return true
-                    }
-                } catch (e) {
-                    console.warn('Direct reconnect failed, trying full reconnect:', e)
-                }
-            }
-            
-            let requestOptions: any = {
-                optionalServices: [0x1816]
-            }
-            
-            if (opts.deviceName && opts.deviceName.value) {
-                requestOptions.filters = [{ name: opts.deviceName.value }]
-            } else if (opts.deviceNamePrefix && opts.deviceNamePrefix.value) {
-                requestOptions.filters = [{ namePrefix: opts.deviceNamePrefix.value }]
-            } else {
-                requestOptions.acceptAllDevices = true
-            }
-
-            const dev = await navigator.bluetooth.requestDevice(requestOptions)
-            
-            if (dev.id !== savedDeviceId) {
-                device = dev
-                savedDeviceId = dev.id
-            } else {
-                device = dev
-            }
-            
-            deviceName.value = dev.name || 'Невідомий пристрій'
-            device.addEventListener('gattserverdisconnected', onDisconnected)
-
-            const server = await dev.gatt!.connect()
+            const server = await device.gatt.connect()
             
             if (!server.connected) {
                 throw new Error('Server not connected')
@@ -240,16 +180,13 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
         } catch (e: unknown) {
             console.error('Reconnection error:', e)
             const error = e as Error
-            if (error?.name === 'NotFoundError' || error?.message?.includes('cancelled')) {
-                status.value = 'Перепідключення скасовано'
-                return false
-            }
+            
             if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
                 setTimeout(() => {
                     reconnect()
                 }, 2000)
             } else {
-                status.value = 'Не вдалося перепідключитися'
+                status.value = 'Не вдалося перепідключитися. Натисніть "Підключити" для повторного підключення'
                 deviceName.value = ''
                 savedDeviceId = null
             }
@@ -383,7 +320,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     function stopClock() {
-        // stopSim()
         stopElapsed()
         stopSpeedCheck()
         isClockRunning = false
@@ -399,7 +335,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
     }
 
     function reset() {
-        // stopSim()
         stopElapsed()
         stopSpeedCheck()
         isClockRunning = false
@@ -424,7 +359,6 @@ export default function useCycplusDevice(opts: UseCycplusOptions) {
 
     return {
         angle, targetAngle, speedKmh, distanceM, elapsedMs, status, deviceName,
-        connect, disconnect, reconnect, reset, recalibrate, startClock, stopClock, stopDataProcessing, isConnected,
-        // startSim, stopSim
+        connect, disconnect, reconnect, reset, recalibrate, startClock, stopClock, stopDataProcessing, isConnected
     }
 }

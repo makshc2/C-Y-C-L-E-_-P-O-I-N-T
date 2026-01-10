@@ -67,7 +67,6 @@ const lapColumns = [
         @update:expanded="val => expanded = val"
         no-data-label="Поки що немає записів"
     >
-      <!-- Дії -->
       <template #body-cell-actions="props">
         <q-td :props="props">
           <q-btn dense flat icon="unfold_more" @click="props.expand = !props.expand">

@@ -48,9 +48,6 @@ const supportHint = computed(() => ensureSupport())
 const raceElapsedMs = computed(() => Math.max(dev1.elapsedMs.value, dev2.elapsedMs.value))
 const timeText = computed(() => formatTime(raceElapsedMs.value))
 
-// const startSim = () => { dev1.startSim(40); dev2.startSim(35) }
-// const stopSim  = () => { dev1.stopSim();    dev2.stopSim() }
-
 async function connectOne(device: ReturnType<typeof useCycplusDevice>, displayName: string) {
   if (supportHint.value) {
     Notify.create({ type: 'negative', message: supportHint.value })
