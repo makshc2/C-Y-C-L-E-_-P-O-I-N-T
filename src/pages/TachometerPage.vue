@@ -6,6 +6,7 @@ import TachometerGauge from '../components/TachometerGauge.vue'
 import WinnerDialog from '../components/modals/WinnerDialog.vue'
 import { WHEEL_OPTIONS, DEFAULT_WHEEL_CIRC } from '../constants/wheels'
 import { addRace, type Lap, type RaceRecord } from '../services/localDb'
+import { archiveRace } from '../services/raceArchiveApi'
 import { formatTime } from '../utils/time'
 import { Notify } from 'quasar'
 
@@ -135,6 +136,7 @@ function persistRace() {
     laps2: laps2.value,
   }
   addRace(record)
+  archiveRace(record)
 }
 
 function onFinishComputed() {

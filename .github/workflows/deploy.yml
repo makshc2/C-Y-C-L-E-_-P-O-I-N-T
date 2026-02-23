@@ -36,6 +36,7 @@ jobs:
       - name: Build
         env:
           NODE_ENV: production
+          VITE_ARCHIVE_API_URL: ${{ vars.VITE_ARCHIVE_API_URL }}
         run: npm run build
 
       - name: Upload artifact
