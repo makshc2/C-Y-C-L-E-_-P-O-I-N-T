@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { initDb, insertRace } from './db.js'
+import { initDb, insertRace, getAllRaces } from './db.js'
 import { validateRaceRecord } from './validate.js'
 
 initDb()
@@ -10,6 +10,16 @@ const port = Number(process.env.PORT) || 3000
 
 app.use(cors({ origin: true }))
 app.use(express.json({ limit: '512kb' }))
+
+app.get('/api/races', (req, res) => {
+  try {
+    const races = getAllRaces()
+    res.json(races)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
 
 app.post('/api/races', (req, res) => {
   const validation = validateRaceRecord(req.body)

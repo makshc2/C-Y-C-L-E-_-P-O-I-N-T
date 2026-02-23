@@ -36,6 +36,30 @@ function getDb() {
   return db
 }
 
+function rowToRecord(row) {
+  return {
+    id: row.id,
+    dateIso: row.date_iso,
+    finishMeters: row.finish_meters,
+    runner1: JSON.parse(row.runner1),
+    runner2: JSON.parse(row.runner2),
+    winner: row.winner === 'tie' ? 'tie' : Number(row.winner),
+    time1: row.time1,
+    time2: row.time2,
+    laps1: JSON.parse(row.laps1 || '[]'),
+    laps2: JSON.parse(row.laps2 || '[]'),
+  }
+}
+
+export function getAllRaces() {
+  const database = getDb()
+  const stmt = database.prepare(`
+    SELECT id, date_iso, finish_meters, runner1, runner2, winner, time1, time2, laps1, laps2
+    FROM races ORDER BY date_iso DESC
+  `)
+  return stmt.all().map(rowToRecord)
+}
+
 export function insertRace(row) {
   const database = getDb()
   const stmt = database.prepare(`
