@@ -1,12 +1,35 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getRaces, deleteRace, clearRaces, type RaceRecord } from '@/services/localDb'
+import { fetchRaces, hasArchiveApi } from '@/services/raceArchiveApi'
 import { formatTime } from '@/utils/time'
 
 const rows = ref<RaceRecord[]>([])
 const expanded = ref<string[]>([])
+const fromApi = ref(false)
+const loading = ref(false)
 
-function load() { rows.value = getRaces() }
+async function load() {
+  if (hasArchiveApi) {
+    loading.value = true
+    try {
+      const data = await fetchRaces()
+      rows.value = Array.isArray(data) ? data : []
+      fromApi.value = true
+    } catch {
+      rows.value = getRaces()
+      fromApi.value = false
+    } finally {
+      loading.value = false
+    }
+  } else {
+    rows.value = getRaces()
+    fromApi.value = false
+  }
+}
+function refresh() {
+  load()
+}
 function fmtDate(iso: string) { return new Date(iso).toLocaleString() }
 function fmtWinner(r: RaceRecord) {
   if (r.winner === 'tie') return 'Нічия'
@@ -48,11 +71,14 @@ const lapColumns = [
 <template>
   <q-page class="q-pa-md">
     <div class="row items-center justify-between q-mb-md">
-      <div class="text-h5">Архів заїздів</div>
+      <div class="row items-center q-gutter-sm">
+        <div class="text-h5">Архів заїздів</div>
+        <q-badge v-if="fromApi" color="primary" label="З сервера" />
+        <q-spinner v-if="loading" size="24" />
+      </div>
       <div class="row q-col-gutter-sm">
-        <div class="col-auto">
-          <q-btn color="negative" outline label="Очистити архів" @click="clearAll" />
-        </div>
+        <q-btn v-if="fromApi" flat icon="refresh" label="Оновити" @click="refresh" :loading="loading" />
+        <q-btn v-else color="negative" outline label="Очистити архів" @click="clearAll" />
       </div>
     </div>
 
@@ -72,7 +98,7 @@ const lapColumns = [
           <q-btn dense flat icon="unfold_more" @click="props.expand = !props.expand">
             <q-tooltip>Показати лапи</q-tooltip>
           </q-btn>
-          <q-btn dense flat icon="delete" color="negative" @click="removeOne(props.row.id)">
+          <q-btn v-if="!fromApi" dense flat icon="delete" color="negative" @click="removeOne(props.row.id)">
             <q-tooltip>Видалити</q-tooltip>
           </q-btn>
         </q-td>
