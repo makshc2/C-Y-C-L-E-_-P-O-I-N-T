@@ -10,7 +10,11 @@
     "typecheck": "vue-tsc --noEmit",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --port 4173",
-    "quasar:icons": "echo '(@quasar/extras підключений, окремий крок не потрібен)'"
+    "quasar:icons": "echo '(@quasar/extras підключений, окремий крок не потрібен)'",
+    "openspec:list": "openspec list",
+    "openspec:validate": "openspec validate --all",
+    "openspec:update": "openspec update --force",
+    "openspec:setup": "openspec init --tools cursor --force --profile core"
   },
   "dependencies": {
     "@quasar/extras": "^1.17.0",
@@ -20,6 +24,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@fission-ai/openspec": "^1.4.1",
     "@types/node": "^24.5.0",
     "@types/web-bluetooth": "^0.0.21",
     "@vitejs/plugin-vue": "^6.0.1",
