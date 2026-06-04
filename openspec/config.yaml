@@ -1,0 +1,37 @@
+schema: spec-driven
+
+context: |
+  Cycle Point — веб-додаток для велозмагань з датчиками CYCPLUS S3 (Web Bluetooth).
+
+  Стек: Vue 3 (Composition API, <script setup> only), TypeScript, Quasar, Vite, vue-router.
+  Без Options API. Коментарі в коді не додавати без потреби.
+  UI-тексти та пояснення для користувача — українською.
+
+  Фронт: GitHub Pages (base: /C-Y-C-L-E-_-P-O-I-N-T/). Архів гонок — localStorage (ключ races_db_v1)
+  або опційно VITE_ARCHIVE_API_URL → Express + SQLite у server/.
+
+  Ключові шляхи:
+  - src/pages/TachometerPage.vue — гонка, Bluetooth, persistRace
+  - src/pages/ResultsArchivePage.vue — архів результатів
+  - src/composables/useCycplusDevice.ts — датчик
+  - src/services/localDb.ts, raceArchiveApi.ts
+  - server/ — API /api/races (Render)
+
+  Перевірки перед merge/archive:
+  - npm run typecheck
+  - npm run build
+
+  Web Bluetooth: лише secure context (https або localhost); для LAN — npm run dev:https.
+
+rules:
+  proposal:
+    - Мова артефактів: українська
+    - Завжди секції Non-goals та Acceptance
+  design:
+    - Враховувати обмеження Web Bluetooth і мобільні браузери
+  tasks:
+    - Кроки з посиланням на файли в src/ або server/
+    - Після імплементації: typecheck + build
+  specs:
+    - Вимоги у форматі MUST/SHOULD; сценарії GIVEN/WHEN/THEN
+    - Без фрагментів коду в spec.md
