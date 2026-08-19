@@ -25,3 +25,8 @@ dist-ssr
 *.sln
 *.sw?
 /node_modules/
+.cursor
+.cursor/memory.json
+.amp/settings.json
+.claude
+.agents/figma.local.env

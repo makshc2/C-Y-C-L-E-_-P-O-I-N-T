@@ -4,8 +4,9 @@ context: |
   Cycle Point — веб-додаток для велозмагань з датчиками CYCPLUS S3 (Web Bluetooth).
 
   Стек: Vue 3 (Composition API, <script setup> only), TypeScript, Quasar, Vite, vue-router.
-  Без Options API. Коментарі в коді не додавати без потреби.
+  Без Pinia і Axios у поточному стеку. Без Options API. Коментарі в коді не додавати без потреби.
   UI-тексти та пояснення для користувача — українською.
+  Мова агента: uk.
 
   Фронт: GitHub Pages (base: /C-Y-C-L-E-_-P-O-I-N-T/). Архів гонок — localStorage (ключ races_db_v1)
   або опційно VITE_ARCHIVE_API_URL → Express + SQLite у server/.
@@ -22,16 +23,23 @@ context: |
   - npm run build
 
   Web Bluetooth: лише secure context (https або localhost); для LAN — npm run dev:https.
+  Код: production-ready.
 
 rules:
   proposal:
     - Мова артефактів: українська
-    - Завжди секції Non-goals та Acceptance
+    - Завжди секції Non-goals та Acceptance criteria
   design:
+    - Посилайся на існуючі патерни в src/
     - Враховувати обмеження Web Bluetooth і мобільні браузери
+    - Описуй зміни на рівні компонентів, composables, API
   tasks:
     - Кроки з посиланням на файли в src/ або server/
+    - Контракт таска: індентовані поля Files: (реальні шляхи; нові — з префіксом new file:), Do: (конкретна зміна, 1–3 рядки), Done-when: (перевірна умова або команда)
+    - Таск самодостатній без design.md; без неконкретних формулювань («as needed», «if necessary», «за потреби»)
     - Після імплементації: typecheck + build
   specs:
+    - Delta format: ADDED / MODIFIED / REMOVED
     - Вимоги у форматі MUST/SHOULD; сценарії GIVEN/WHEN/THEN
+    - Кожна вимога — мінімум один Scenario
     - Без фрагментів коду в spec.md
