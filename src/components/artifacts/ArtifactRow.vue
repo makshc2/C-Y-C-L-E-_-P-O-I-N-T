@@ -1,5 +1,6 @@
 <script setup lang="ts">
 defineProps<{
+  id: string
   photo: string
   text: string
   tone: 'green' | 'tiffany'
@@ -7,7 +8,12 @@ defineProps<{
 </script>
 
 <template>
-  <article class="artifact-row" :class="`artifact-row--${tone}`">
+  <article
+    :id="id"
+    class="artifact-row"
+    :class="`artifact-row--${tone}`"
+    tabindex="-1"
+  >
     <img class="artifact-row__photo" :src="photo" alt="">
     <p class="artifact-row__text">{{ text }}</p>
   </article>

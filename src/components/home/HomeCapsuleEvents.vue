@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { shallowRef } from 'vue'
-import { INSTAGRAM_URL } from '@/constants/site'
+import { RouterLink } from 'vue-router'
 import { homeCapsuleLabels } from '@/content/home'
 import photoUrl from '@/assets/site/home-events-photo.png'
 import glassesUrl from '@/assets/site/deco-glasses.svg'
@@ -9,12 +9,10 @@ const hovered = shallowRef(false)
 </script>
 
 <template>
-  <a
+  <RouterLink
     class="capsule"
     :class="{ 'is-hovered': hovered }"
-    :href="INSTAGRAM_URL"
-    target="_blank"
-    rel="noopener noreferrer"
+    to="/events"
     @mouseenter="hovered = true"
     @mouseleave="hovered = false"
   >
@@ -22,7 +20,7 @@ const hovered = shallowRef(false)
     <img class="capsule__glasses" :src="glassesUrl" alt="" aria-hidden="true">
     <span class="capsule__blur" />
     <span class="capsule__label">{{ homeCapsuleLabels.events }}</span>
-  </a>
+  </RouterLink>
 </template>
 
 <style scoped>

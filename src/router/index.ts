@@ -43,6 +43,11 @@ const routes: RouteRecordRaw[] = [
     meta: { chrome: 'site' },
   },
   {
+    path: '/events',
+    component: () => import('../pages/EventsPage.vue'),
+    meta: { chrome: 'site' },
+  },
+  {
     path: '/artifacts',
     component: () => import('../pages/ArtifactsPage.vue'),
     meta: { chrome: 'site' },
@@ -62,8 +67,9 @@ export default createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to) {
-    if (to.hash === '#contacts' || to.hash === 'contacts') {
-      return { el: '#contacts' }
+    if (to.hash) {
+      const hash = to.hash.startsWith('#') ? to.hash : `#${to.hash}`
+      return { el: hash }
     }
     return { top: 0 }
   },

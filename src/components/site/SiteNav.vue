@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { INSTAGRAM_URL } from '@/constants/site'
 </script>
 
 <template>
@@ -20,14 +19,9 @@ import { INSTAGRAM_URL } from '@/constants/site'
     <RouterLink class="site-nav__link" to="/artifacts">
       Артефакти
     </RouterLink>
-    <a
-      class="site-nav__link"
-      :href="INSTAGRAM_URL"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <RouterLink class="site-nav__link" to="/events">
       Події
-    </a>
+    </RouterLink>
   </nav>
 </template>
 

@@ -1,5 +1,16 @@
 export const INSTAGRAM_URL = 'https://www.instagram.com/cyclepoint_workshop/'
 
+export const EVENTS_INSTAGRAM_URL = 'https://www.instagram.com/cyclepoint_kyiv/'
+
+export const EVENTS_INSTAGRAM_EMBED_SRC =
+  'https://www.instagram.com/cyclepoint_kyiv/embed'
+
+export const WORKSHOP_PRICE_SHEET_SRC =
+  'https://docs.google.com/spreadsheets/d/14uzzfjP3ak0qjtX2TAON8NrpXWkyL67amTsg15BW6Gc/preview?gid=0&rm=minimal&range=A1:C200'
+
+export const CHARITY_RESULTS_SHEET_SRC =
+  'https://docs.google.com/spreadsheets/d/1xZ0xpcZdbfgJJAIpr9FvPthXycFrIlzFFMQI8Jr_Rvs/preview?gid=0&rm=minimal&range=A1:F80'
+
 export const COPYRIGHT_PATHS = ['/', '/charity'] as const
 
 export type GeoPoint = {
