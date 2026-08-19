@@ -37,7 +37,7 @@ import qrUrl from '@/assets/site/charity-qr.png'
   background-color: var(--color-violet);
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .charity__green {
     height: auto;
     min-height: 70vh;

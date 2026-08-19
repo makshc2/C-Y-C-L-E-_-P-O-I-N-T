@@ -80,7 +80,7 @@ defineProps<{
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .project-row {
     grid-template-columns: 1fr;
     padding: 32px 16px 40px;
@@ -88,7 +88,8 @@ defineProps<{
   }
 
   .project-row__photo {
-    width: min(178px, 100%);
+    width: 100%;
+    max-width: none;
     height: auto;
   }
 }

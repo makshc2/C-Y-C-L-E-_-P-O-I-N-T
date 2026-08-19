@@ -79,7 +79,7 @@ import photoUrl from '@/assets/site/gs-detail-photo.png'
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .gs {
     display: flex;
     flex-direction: column;
@@ -90,7 +90,12 @@ import photoUrl from '@/assets/site/gs-detail-photo.png'
 
   .gs__photo {
     width: 100%;
+    max-width: none;
     height: auto;
+  }
+
+  .gs__copy p {
+    max-width: none;
   }
 
   .gs__title {

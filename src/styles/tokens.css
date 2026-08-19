@@ -63,7 +63,6 @@
   --capsule-projects-w: 699px;
   --capsule-default-h: 120px;
   --capsule-hover-w: 440px;
-  --capsule-events-hover-h: 112px;
   --capsule-projects-hover-h: 120px;
   --ig-icon: 50px;
   --artifact-photo-w: 400px;
@@ -85,11 +84,9 @@
   --shadow-capsule-label: 0px 4px 4px rgba(30, 30, 30, 0.25);
   --blur-projects: 3.85px;
   --blur-projects-opacity: 0.20;
-  --blur-events: 10px;
-  --blur-events-opacity: 0.60;
-  --blur-events-hover: 10.35px;
   --blur-capsule-hover-opacity: 0.15;
 
-  --bp-desktop: 1728px;
+  --bp-desktop: 1280px;
+  --bp-tablet: 768px;
   --page-w: 1728px;
 }

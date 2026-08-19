@@ -48,7 +48,7 @@ import SiteLangToggle from './SiteLangToggle.vue'
   margin-right: 45px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .site-header {
     height: auto;
   }

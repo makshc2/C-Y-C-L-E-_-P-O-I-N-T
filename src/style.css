@@ -42,7 +42,7 @@ button {
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .site-stack {
     flex-direction: column;
   }

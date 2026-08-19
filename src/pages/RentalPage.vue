@@ -89,7 +89,7 @@ const catalog = rentalBikes.map((bike) => ({
   background-color: var(--color-violet);
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .rental-intro {
     min-height: 0;
     padding: 32px 16px 48px;

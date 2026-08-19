@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { CHARITY_RESULTS_SHEET_SRC } from '@/constants/site'
 import { armySupportCopy } from '@/content/armySupport'
+import SitePagePreloader from '@/components/site/SitePagePreloader.vue'
+import { useEmbedReady } from '@/composables/useEmbedReady'
+
+const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
 </script>
 
 <template>
   <section class="army">
+    <SitePagePreloader :show="!ready" />
     <h1 class="army__heading">{{ armySupportCopy.heading }}</h1>
     <div class="army__sheet">
       <iframe
+        v-if="embedSrc"
         class="army__sheet-frame"
-        :src="CHARITY_RESULTS_SHEET_SRC"
+        :src="embedSrc"
         title="Результати благодійності Cycle Point"
-        loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         allowfullscreen
+        @load="markReady"
       />
     </div>
   </section>
@@ -55,7 +61,7 @@ import { armySupportCopy } from '@/content/armySupport'
   border: 0;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .army {
     padding: 32px 16px 48px;
   }

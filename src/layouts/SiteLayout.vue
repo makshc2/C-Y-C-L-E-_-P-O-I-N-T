@@ -32,7 +32,7 @@ const showCopyrightSymbol = computed(() =>
   width: 100%;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .site-layout__main {
     overflow-x: hidden;
   }

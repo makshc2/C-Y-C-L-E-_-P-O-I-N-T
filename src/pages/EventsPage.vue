@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { EVENTS_INSTAGRAM_EMBED_SRC, EVENTS_INSTAGRAM_URL } from '@/constants/site'
 import { eventsCopy } from '@/content/events'
+import SitePagePreloader from '@/components/site/SitePagePreloader.vue'
+import { useEmbedReady } from '@/composables/useEmbedReady'
+
+const { ready, embedSrc, markReady } = useEmbedReady(EVENTS_INSTAGRAM_EMBED_SRC)
 </script>
 
 <template>
   <section class="events">
+    <SitePagePreloader :show="!ready" />
     <h1 class="events__heading">
       <a
         class="events__heading-link"
@@ -17,11 +22,12 @@ import { eventsCopy } from '@/content/events'
     </h1>
     <div class="events__embed">
       <iframe
+        v-if="embedSrc"
         class="events__frame"
-        :src="EVENTS_INSTAGRAM_EMBED_SRC"
+        :src="embedSrc"
         title="Instagram Cycle Point Kyiv"
-        loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
+        @load="markReady"
       />
     </div>
   </section>
@@ -71,7 +77,7 @@ import { eventsCopy } from '@/content/events'
   border: 0;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .events {
     padding: 32px 16px 48px;
   }

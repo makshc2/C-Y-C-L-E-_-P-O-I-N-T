@@ -10,7 +10,7 @@ export const homeContacts = {
   hoursTitle: 'Працюємо:',
   hoursWeekday: 'Ср - Пт 13:00 - 22:00',
   hoursWeekend: 'Cб - Нд 10:00 - 22:00',
-  workshopNote: 'Веломайстерня працює за попередньою / домовленістю',
+  workshopNote: 'Веломайстерня працює за попередньою домовленістю',
   address: 'вул. Богдана Хмельницького, 58А, Київ',
   phone: '096-818-12-46',
   email: 'cyclepoint.kyiv@gmail.com',

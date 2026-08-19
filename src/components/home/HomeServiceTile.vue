@@ -17,7 +17,7 @@ defineProps<{
 
 <style scoped>
 .tile {
-  position: absolute;
+  position: relative;
   display: block;
 }
 
@@ -41,12 +41,18 @@ defineProps<{
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (min-width: 1728px) {
+  .tile {
+    position: absolute;
+  }
+}
+
+@media (max-width: 767px) {
   .tile {
     position: relative;
     left: auto;
     top: auto;
-    width: auto;
+    width: 100%;
     height: auto;
     min-height: 0;
     padding: 32px 16px;

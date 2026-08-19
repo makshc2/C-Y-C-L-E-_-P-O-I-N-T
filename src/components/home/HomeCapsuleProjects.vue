@@ -1,30 +1,11 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
 import { homeCapsuleLabels } from '@/content/home'
 import photoUrl from '@/assets/site/home-projects-photo.png'
-
-const hovered = shallowRef(false)
-const left = shallowRef(false)
-
-function onEnter() {
-  hovered.value = true
-}
-
-function onLeave() {
-  hovered.value = false
-  left.value = true
-}
 </script>
 
 <template>
-  <RouterLink
-    class="capsule"
-    :class="{ 'is-hovered': hovered, 'is-left': left && !hovered }"
-    to="/projects"
-    @mouseenter="onEnter"
-    @mouseleave="onLeave"
-  >
+  <RouterLink class="capsule" to="/projects">
     <img class="capsule__photo" :src="photoUrl" alt="">
     <span class="capsule__blur" />
     <span class="capsule__label">{{ homeCapsuleLabels.projects }}</span>
@@ -50,17 +31,8 @@ function onLeave() {
 
 .capsule__blur {
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: var(--capsule-default-h);
-  background-color: rgb(255 255 255 / var(--blur-projects-opacity));
-  backdrop-filter: blur(var(--blur-projects));
-  -webkit-backdrop-filter: blur(var(--blur-projects));
-}
-
-.capsule.is-hovered .capsule__blur {
   left: 50%;
+  bottom: 0;
   width: var(--capsule-hover-w);
   height: var(--capsule-projects-hover-h);
   transform: translateX(-50%);
@@ -71,11 +43,9 @@ function onLeave() {
   background-color: rgb(255 255 255 / var(--blur-capsule-hover-opacity));
   backdrop-filter: blur(var(--blur-projects));
   -webkit-backdrop-filter: blur(var(--blur-projects));
-}
-
-.capsule.is-left .capsule__blur {
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
 }
 
 .capsule__label {
@@ -93,34 +63,26 @@ function onLeave() {
   white-space: nowrap;
 }
 
-.capsule.is-hovered .capsule__label {
-  left: 0;
-  right: 0;
-  top: auto;
-  bottom: 0;
-  height: var(--capsule-projects-hover-h);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@media (hover: hover) {
+  .capsule:hover .capsule__blur {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.capsule:focus-visible .capsule__blur {
+  opacity: 1;
+  visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .capsule__blur,
-  .capsule__label {
-    transition:
-      width 0.28s ease,
-      height 0.28s ease,
-      left 0.28s ease,
-      transform 0.28s ease,
-      border-radius 0.28s ease,
-      background-color 0.28s ease,
-      opacity 0.28s ease;
+  .capsule__blur {
+    transition: opacity 0.28s ease, visibility 0.28s ease;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .capsule__blur,
-  .capsule__label {
+  .capsule__blur {
     transition: none;
   }
 }
@@ -130,11 +92,17 @@ function onLeave() {
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .capsule {
     width: 100%;
+    max-width: 100%;
     height: auto;
+    flex-shrink: 1;
     aspect-ratio: 699 / 480;
+  }
+
+  .capsule__blur {
+    width: min(var(--capsule-hover-w), 90%);
   }
 
   .capsule__label {

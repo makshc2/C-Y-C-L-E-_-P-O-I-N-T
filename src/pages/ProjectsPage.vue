@@ -46,9 +46,15 @@ import armyThumb from '@/assets/site/army-thumb.png'
   width: 175px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .projects__rule {
     margin: 0 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .projects__army :deep(.project-row__photo) {
+    width: 100%;
   }
 }
 </style>

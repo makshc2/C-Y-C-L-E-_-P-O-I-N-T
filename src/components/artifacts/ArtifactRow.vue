@@ -54,7 +54,7 @@ defineProps<{
   white-space: pre-line;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .artifact-row {
     grid-template-columns: 1fr;
     min-height: 0;

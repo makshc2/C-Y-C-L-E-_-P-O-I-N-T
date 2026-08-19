@@ -13,12 +13,6 @@ import { RouterLink } from 'vue-router'
     <RouterLink class="site-nav__link" to="/workshop">
       Майстерня
     </RouterLink>
-    <RouterLink class="site-nav__link" to="/rental">
-      Прокат
-    </RouterLink>
-    <RouterLink class="site-nav__link" to="/artifacts">
-      Артефакти
-    </RouterLink>
     <RouterLink class="site-nav__link" to="/events">
       Події
     </RouterLink>
@@ -47,7 +41,7 @@ import { RouterLink } from 'vue-router'
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .site-nav {
     flex-wrap: wrap;
     gap: 12px 24px;

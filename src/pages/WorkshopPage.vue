@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { INSTAGRAM_URL, WORKSHOP_PRICE_SHEET_SRC } from '@/constants/site'
 import { workshopCopy } from '@/content/workshop'
+import SitePagePreloader from '@/components/site/SitePagePreloader.vue'
+import { useEmbedReady } from '@/composables/useEmbedReady'
+
+const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
 </script>
 
 <template>
   <section class="workshop">
+    <SitePagePreloader :show="!ready" />
     <h1 class="workshop__heading">{{ workshopCopy.heading }}</h1>
     <a
       class="workshop__url"
@@ -17,12 +22,13 @@ import { workshopCopy } from '@/content/workshop'
     <p class="workshop__intro">{{ workshopCopy.servicesIntro }}</p>
     <div class="workshop__sheet">
       <iframe
+        v-if="embedSrc"
         class="workshop__sheet-frame"
-        :src="WORKSHOP_PRICE_SHEET_SRC"
+        :src="embedSrc"
         title="Прейскурант послуг майстерні Cycle Point"
-        loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         allowfullscreen
+        @load="markReady"
       />
     </div>
   </section>
@@ -80,7 +86,7 @@ import { workshopCopy } from '@/content/workshop'
   border: 0;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .workshop {
     height: auto;
     padding: 32px 16px 48px;
@@ -88,6 +94,28 @@ import { workshopCopy } from '@/content/workshop'
 
   .workshop__url {
     margin-top: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  .workshop {
+    padding-inline: 0;
+  }
+
+  .workshop__heading,
+  .workshop__url,
+  .workshop__intro,
+  .workshop__note {
+    padding-inline: 16px;
+  }
+
+  .workshop__sheet {
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .workshop__sheet-frame {
+    width: 100%;
   }
 }
 </style>

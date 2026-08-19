@@ -49,7 +49,7 @@ defineProps<{
   color: var(--color-green);
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .rental-bike {
     grid-template-columns: 1fr;
     row-gap: 16px;

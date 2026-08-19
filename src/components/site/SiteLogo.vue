@@ -30,7 +30,7 @@ import logoUrl from '@/assets/site/logo-cyclepoint-header.png'
   object-fit: contain;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 1279px) {
   .site-logo,
   .site-logo__img {
     width: min(var(--logo-w), 70vw);

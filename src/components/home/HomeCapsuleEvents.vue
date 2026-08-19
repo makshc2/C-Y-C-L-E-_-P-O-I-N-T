@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
 import { homeCapsuleLabels } from '@/content/home'
 import photoUrl from '@/assets/site/home-events-photo.png'
-
-const hovered = shallowRef(false)
 </script>
 
 <template>
-  <RouterLink
-    class="capsule"
-    :class="{ 'is-hovered': hovered }"
-    to="/events"
-    @mouseenter="hovered = true"
-    @mouseleave="hovered = false"
-  >
+  <RouterLink class="capsule" to="/events">
     <img class="capsule__photo" :src="photoUrl" alt="">
     <span class="capsule__blur" />
     <span class="capsule__label">{{ homeCapsuleLabels.events }}</span>
@@ -40,27 +31,21 @@ const hovered = shallowRef(false)
 
 .capsule__blur {
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: var(--capsule-default-h);
-  background-color: rgb(255 255 255 / var(--blur-events-opacity));
-  backdrop-filter: blur(var(--blur-events));
-  -webkit-backdrop-filter: blur(var(--blur-events));
-}
-
-.capsule.is-hovered .capsule__blur {
   left: 50%;
+  bottom: 0;
   width: var(--capsule-hover-w);
-  height: var(--capsule-events-hover-h);
+  height: var(--capsule-projects-hover-h);
   transform: translateX(-50%);
   border-radius: var(--radius-capsule);
   border-width: 1.5px;
   border-style: solid;
   border-color: rgb(255 255 255 / 0.2);
   background-color: rgb(255 255 255 / var(--blur-capsule-hover-opacity));
-  backdrop-filter: blur(var(--blur-events-hover));
-  -webkit-backdrop-filter: blur(var(--blur-events-hover));
+  backdrop-filter: blur(var(--blur-projects));
+  -webkit-backdrop-filter: blur(var(--blur-projects));
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .capsule__label {
@@ -78,29 +63,27 @@ const hovered = shallowRef(false)
   white-space: nowrap;
 }
 
-.capsule.is-hovered .capsule__label {
-  left: 0;
-  right: 0;
-  top: auto;
-  bottom: 0;
-  height: var(--capsule-events-hover-h);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
+@media (hover: hover) {
+  .capsule:hover .capsule__blur {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.capsule:focus-visible .capsule__blur {
+  opacity: 1;
+  visibility: visible;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .capsule__blur,
-  .capsule__label {
-    transition:
-      width 0.28s ease,
-      height 0.28s ease,
-      left 0.28s ease,
-      transform 0.28s ease,
-      border-radius 0.28s ease,
-      background-color 0.28s ease,
-      font-size 0.28s ease;
+  .capsule__blur {
+    transition: opacity 0.28s ease, visibility 0.28s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capsule__blur {
+    transition: none;
   }
 }
 
@@ -109,11 +92,17 @@ const hovered = shallowRef(false)
   outline-offset: 2px;
 }
 
-@media (max-width: 1727px) {
+@media (max-width: 767px) {
   .capsule {
     width: 100%;
+    max-width: 100%;
     height: auto;
+    flex-shrink: 1;
     aspect-ratio: 698 / 480;
+  }
+
+  .capsule__blur {
+    width: min(var(--capsule-hover-w), 90%);
   }
 
   .capsule__label {
