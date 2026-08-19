@@ -2,18 +2,20 @@
 import HomeCapsuleEvents from '@/components/home/HomeCapsuleEvents.vue'
 import HomeCapsuleProjects from '@/components/home/HomeCapsuleProjects.vue'
 import HomeServiceTile from '@/components/home/HomeServiceTile.vue'
+import HomeMap from '@/components/home/HomeMap.vue'
 import {
   homeCommunity,
   homeContacts,
   homeIntro,
   homeServiceLabels,
 } from '@/content/home'
-import { INSTAGRAM_URL } from '@/constants/site'
+import { INSTAGRAM_URL, getVenueDirectionsUrl } from '@/constants/site'
 import workshopIcon from '@/assets/site/icon-workshop.png'
 import rentalIcon from '@/assets/site/icon-rental.png'
 import artifactsIcon from '@/assets/site/icon-artifacts.svg'
-import mapUrl from '@/assets/site/map.png'
 import instagramIcon from '@/assets/site/icon-instagram.svg'
+
+const directionsUrl = getVenueDirectionsUrl()
 </script>
 
 <template>
@@ -59,13 +61,7 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
 
     <section id="contacts" class="home-contacts">
       <div class="home-frame">
-        <img
-          class="home-contacts__map"
-          :src="mapUrl"
-          width="596"
-          height="374"
-          alt="Мапа Cycle Point, вул. Богдана Хмельницького, 58А, Київ"
-        >
+        <HomeMap class="home-contacts__map" />
         <div class="home-contacts__info">
           <p class="home-contacts__title">{{ homeContacts.hoursTitle }}</p>
           <p class="home-contacts__hours">
@@ -73,7 +69,14 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
             {{ homeContacts.hoursWeekend }}
           </p>
           <p class="home-contacts__note">{{ homeContacts.workshopNote }}</p>
-          <p class="home-contacts__address">{{ homeContacts.address }}</p>
+          <a
+            class="home-contacts__address"
+            :href="directionsUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ homeContacts.address }}
+          </a>
           <p class="home-contacts__phone">
             <a class="home-contacts__link" :href="`tel:${homeContacts.phone}`">{{ homeContacts.phone }}</a>
           </p>
@@ -231,8 +234,6 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
   top: 53px;
   width: 596px;
   height: 374px;
-  max-width: none;
-  object-fit: cover;
 }
 
 .home-contacts__info {
@@ -245,7 +246,8 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
   font-weight: var(--font-weight-regular);
 }
 
-.home-contacts__info p {
+.home-contacts__info p,
+.home-contacts__address {
   position: absolute;
   left: 0;
   margin: 0;
@@ -272,8 +274,19 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
 
 .home-contacts__address {
   top: 232px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
   font-size: 28px;
   line-height: 32px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.home-contacts__address:hover {
+  text-decoration: underline;
 }
 
 .home-contacts__phone {
@@ -292,6 +305,7 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
   color: inherit;
 }
 
+.home-contacts__address:focus-visible,
 .home-contacts__link:focus-visible,
 .home-contacts__ig:focus-visible {
   outline: 2px solid var(--color-accent-lime);
@@ -332,7 +346,8 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
   .home-contacts__map,
   .home-contacts__info,
   .home-contacts__ig,
-  .home-contacts__info p {
+  .home-contacts__info p,
+  .home-contacts__address {
     position: static;
   }
 
@@ -376,6 +391,7 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
   .home-contacts__map {
     width: 100%;
     height: auto;
+    aspect-ratio: 596 / 374;
   }
 
   .home-contacts__info {
@@ -384,7 +400,8 @@ import instagramIcon from '@/assets/site/icon-instagram.svg'
     height: auto;
   }
 
-  .home-contacts__info p {
+  .home-contacts__info p,
+  .home-contacts__address {
     position: static;
   }
 }

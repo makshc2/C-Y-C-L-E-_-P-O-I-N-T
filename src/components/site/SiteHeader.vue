@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SiteLogo from './SiteLogo.vue'
+import SiteMapPin from './SiteMapPin.vue'
 import SiteNav from './SiteNav.vue'
 import SiteCharityButton from './SiteCharityButton.vue'
 import SiteLangToggle from './SiteLangToggle.vue'
@@ -9,6 +10,7 @@ import SiteLangToggle from './SiteLangToggle.vue'
   <header class="site-header">
     <div class="site-header__inner">
       <SiteLogo />
+      <SiteMapPin />
       <div class="site-header__right">
         <SiteNav />
         <SiteCharityButton class="site-header__charity" />
