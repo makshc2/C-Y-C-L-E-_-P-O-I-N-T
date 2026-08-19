@@ -1,59 +1,12 @@
 ---
-description: 
+description: Memory MCP auto-setup for Cursor and Amp
 alwaysApply: true
 ---
 
-# Memory MCP Auto-Setup (Cursor + Amp)
+# Memory MCP
 
-At the start of every session, check project root for memory MCP. Run setup silently without asking.
+If `.mcp.json` / `.amp/settings.json` lacks `memory`, or `MEMORY_FILE_PATH` is relative: run `npx agent-orchestrator-kit memory-setup`. Relative paths resolve inside npx `dist/` and look like “memory ignored”.
 
-Shared memory file: `.cursor/memory.json` (same path for Cursor and Amp).
+Use `node scripts/memory-mcp-launcher.cjs` (no relative `MEMORY_FILE_PATH`). Shared file: `.cursor/memory.json` (gitignored). Do not delete other MCP servers.
 
-## Cursor
-
-1. Read `.mcp.json` in project root.
-2. If missing or `mcpServers.memory` is absent — create or merge:
-
-```json
-"memory": {
-  "command": "npx",
-  "args": ["-y", "@modelcontextprotocol/server-memory"],
-  "env": { "MEMORY_FILE_PATH": ".cursor/memory.json" }
-}
-```
-
-3. Do not remove or overwrite other `mcpServers` entries.
-
-## Amp
-
-1. Read `.amp/settings.json` in project root.
-2. If missing or `amp.mcpServers.memory` is absent — run from project root:
-
-```bash
-amp mcp add memory --workspace --env MEMORY_FILE_PATH=.cursor/memory.json -- npx -y @modelcontextprotocol/server-memory
-```
-
-3. If `amp` is not in PATH, try `~/.amp/bin/amp` or `~/.local/bin/amp`.
-4. If Amp is not installed, skip Amp setup and mention it once briefly.
-
-## .gitignore
-
-Ensure these lines exist (append only, do not duplicate):
-
-```
-.cursor/memory.json
-.amp/settings.json
-```
-
-## Amp agent instructions (`.agents/`)
-
-If `.agents/rules/memory-mcp-autosetup.mdc` is missing, create `.agents/rules/` and copy this rule file there (same content). Amp reads `.agents/rules/` on workspace sessions.
-
-## Notify once
-
-After any change: "Memory MCP підключено (Cursor / Amp)." List which tools were configured.
-
-## Never
-
-- Do not overwrite existing memory MCP config if already correct
-- Do not delete user MCP servers other than adding `memory` when missing
+Entities: `Change:<name>` (status, tasks n/m, last_role, review) · `Handoff:<name>` (next_role, next_command, session_count, summary, blocked) · `Decision:<topic>` (chosen, reason). Writer: `npx agent-orchestrator-kit handoff <name>`. Notify once: “Memory MCP connected.”
