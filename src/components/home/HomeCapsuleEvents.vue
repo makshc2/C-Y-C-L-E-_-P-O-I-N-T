@@ -3,7 +3,6 @@ import { shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
 import { homeCapsuleLabels } from '@/content/home'
 import photoUrl from '@/assets/site/home-events-photo.png'
-import glassesUrl from '@/assets/site/deco-glasses.svg'
 
 const hovered = shallowRef(false)
 </script>
@@ -17,7 +16,6 @@ const hovered = shallowRef(false)
     @mouseleave="hovered = false"
   >
     <img class="capsule__photo" :src="photoUrl" alt="">
-    <img class="capsule__glasses" :src="glassesUrl" alt="" aria-hidden="true">
     <span class="capsule__blur" />
     <span class="capsule__label">{{ homeCapsuleLabels.events }}</span>
   </RouterLink>
@@ -38,16 +36,6 @@ const hovered = shallowRef(false)
   height: 100%;
   max-width: none;
   object-fit: cover;
-}
-
-.capsule__glasses {
-  position: absolute;
-  top: 106px;
-  left: 178px;
-  width: 38px;
-  height: 8px;
-  transform: rotate(2.91deg);
-  pointer-events: none;
 }
 
 .capsule__blur {
@@ -126,13 +114,6 @@ const hovered = shallowRef(false)
     width: 100%;
     height: auto;
     aspect-ratio: 698 / 480;
-  }
-
-  .capsule__glasses {
-    left: 26%;
-    top: 22%;
-    width: 5%;
-    height: auto;
   }
 
   .capsule__label {
