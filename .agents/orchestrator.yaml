@@ -1,5 +1,5 @@
 version: 1
-kit_version: "0.3.0"
+kit_version: "0.4.0"
 
 project:
   name: "Cycle Point"
@@ -66,7 +66,24 @@ mcp:
   optional:
     - figma
     - github
+    - gitlab
     - browser
+
+skills:
+  kit:
+    - agent-orchestration
+    - openspec-howto
+    - openspec-explore
+    - openspec-propose
+    - openspec-apply-change
+    - openspec-archive-change
+    - openspec-sync-specs
+    - spec-workflow-openspec
+  stack:
+    - vue-core
+    - vue-router
+    - vite
+  external: frontend-agent-skills
 
 figma:
   env_file: .agents/figma.local.env
@@ -77,3 +94,16 @@ verifier:
   lint_command: "npm run typecheck"
   build_command: "npm run build"
   test_command: "npm test"
+
+cli:
+  status: npx agent-orchestrator-kit status
+  gate_check: npx agent-orchestrator-kit gate-check
+  handoff: npx agent-orchestrator-kit handoff <name>
+  handoff_restore: npx agent-orchestrator-kit handoff --restore
+  memory_setup: npx agent-orchestrator-kit memory-setup
+  mcp_setup: npx agent-orchestrator-kit mcp-setup
+  hooks_setup: npx agent-orchestrator-kit hooks-setup
+  openspec_list: npx openspec list
+  openspec_validate_change: npx openspec validate <name> --strict --type change
+  openspec_validate_all: npx openspec validate --all --strict
+  openspec_status: npx openspec status --change <name> --json

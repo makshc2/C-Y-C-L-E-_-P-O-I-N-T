@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# agent-orchestrator-kit gate
+sh scripts/pre-commit-gate-check.sh
