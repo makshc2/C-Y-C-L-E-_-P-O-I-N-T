@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import SiteBackLink from '@/components/site/SiteBackLink.vue'
 import { goldenSprintsDetail, readMoreLabel } from '@/content/projects'
 import photoUrl from '@/assets/site/gs-detail-photo.png'
 </script>
 
 <template>
   <section class="gs">
+    <SiteBackLink tone="violet" />
     <img
       class="gs__photo"
       :src="photoUrl"
@@ -29,19 +31,33 @@ import photoUrl from '@/assets/site/gs-detail-photo.png'
 .gs {
   display: grid;
   grid-template-columns: var(--gs-photo-w) minmax(0, 786px);
+  grid-template-rows: max-content 1fr;
+  align-content: start;
   column-gap: 133px;
   min-height: 1251px;
-  padding: 80px 148px 0 145px;
+  padding: 34px 148px 0 145px;
   background-color: var(--color-violet);
 }
 
+.gs > :deep(.site-back) {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  justify-self: start;
+  margin: 0 0 54px;
+}
+
 .gs__photo {
+  grid-column: 1;
+  grid-row: 2;
   width: var(--gs-photo-w);
   height: var(--gs-photo-h);
   object-fit: cover;
 }
 
 .gs__copy {
+  grid-column: 2;
+  grid-row: 2;
   color: var(--color-green);
 }
 
@@ -86,6 +102,10 @@ import photoUrl from '@/assets/site/gs-detail-photo.png'
     min-height: 0;
     padding: 32px 16px 48px;
     row-gap: 24px;
+  }
+
+  .gs > :deep(.site-back) {
+    margin: 0;
   }
 
   .gs__photo {

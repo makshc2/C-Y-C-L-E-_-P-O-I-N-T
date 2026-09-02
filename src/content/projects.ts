@@ -9,7 +9,7 @@ export const goldenSprintsList = {
 
 export const armySupportList = {
   title: 'Допомога армії',
-  body: 'Cycle Point  регулярно співпрацює з військовими підрозділами та організовує збори на нагальні та актуальні потреби друзів Велоточки у війську.',
+  body: 'Cycle Point регулярно співпрацює з військовими підрозділами та організовує збори на нагальні та актуальні потреби друзів Велоточки у війську.',
 } as const
 
 export const goldenSprintsDetail = {

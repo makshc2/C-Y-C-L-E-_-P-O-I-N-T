@@ -11,10 +11,13 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview --port 4173",
     "quasar:icons": "echo '(@quasar/extras підключений, окремий крок не потрібен)'",
-    "openspec:list": "openspec list",
-    "openspec:validate": "openspec validate --all",
-    "openspec:update": "openspec update --force",
-    "openspec:setup": "openspec init --tools cursor --force --profile core"
+    "openspec:list": "npx openspec list",
+    "openspec:validate": "npx openspec validate --all --strict",
+    "openspec:update": "npx openspec update --force",
+    "openspec:setup": "npx openspec init --tools cursor --force --profile core",
+    "verify:openspec": "npx openspec validate --all --strict",
+    "verify:agents": "npx openspec validate --all --strict",
+    "agent:status": "npx agent-orchestrator-kit status"
   },
   "dependencies": {
     "@quasar/extras": "^1.17.0",
@@ -29,7 +32,7 @@
     "@types/web-bluetooth": "^0.0.21",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
-    "agent-orchestrator-kit": "^0.4.0",
+    "agent-orchestrator-kit": "^0.11.0",
     "sass-embedded": "^1.92.1",
     "typescript": "~5.8.3",
     "vite": "^7.1.2",

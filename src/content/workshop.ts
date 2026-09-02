@@ -1,6 +1,5 @@
 export const workshopCopy = {
-  heading: 'Послуги майстерні',
-  instagramLabel: 'Instagram',
-  servicesIntro: 'Майстерня на Велоточці надає такі послуги з обслуговування:',
+  heading: 'Послуги майстерні Велоточки',
+  instagramContact: 'Можна зв\u02BCязатися через інстаграм майстерні',
   bookingNote: 'записатися можна зателефонувавши, через інст і тд',
 } as const

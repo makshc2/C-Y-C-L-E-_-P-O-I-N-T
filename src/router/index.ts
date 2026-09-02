@@ -33,6 +33,11 @@ const routes: RouteRecordRaw[] = [
     meta: { chrome: 'site' },
   },
   {
+    path: '/projects/fishky-velodorizhky',
+    component: () => import('../pages/FishkyVelodorizhkyPage.vue'),
+    meta: { chrome: 'site' },
+  },
+  {
     path: '/workshop',
     component: () => import('../pages/WorkshopPage.vue'),
     meta: { chrome: 'site' },

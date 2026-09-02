@@ -1,3 +1,3 @@
 export const armySupportCopy = {
-  heading: 'Результати благодійності',
+  heading: 'Результати допомоги армії з моменту відкриття Велоточки',
 } as const

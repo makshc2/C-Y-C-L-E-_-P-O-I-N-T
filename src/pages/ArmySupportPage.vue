@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CHARITY_RESULTS_SHEET_SRC } from '@/constants/site'
 import { armySupportCopy } from '@/content/armySupport'
+import SiteBackLink from '@/components/site/SiteBackLink.vue'
 import SitePagePreloader from '@/components/site/SitePagePreloader.vue'
 import { useEmbedReady } from '@/composables/useEmbedReady'
 
@@ -10,13 +11,14 @@ const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
 <template>
   <section class="army">
     <SitePagePreloader :show="!ready" />
+    <SiteBackLink tone="lime" />
     <h1 class="army__heading">{{ armySupportCopy.heading }}</h1>
     <div class="army__sheet">
       <iframe
         v-if="embedSrc"
         class="army__sheet-frame"
         :src="embedSrc"
-        title="Результати благодійності Cycle Point"
+        :title="armySupportCopy.heading"
         referrerpolicy="no-referrer-when-downgrade"
         allowfullscreen
         @load="markReady"
@@ -35,6 +37,10 @@ const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
   padding: 142px var(--gutter) 40px;
   background-color: var(--color-green);
   color: var(--color-fg);
+}
+
+.army :deep(.site-back) {
+  margin: 0 0 16px;
 }
 
 .army__heading {

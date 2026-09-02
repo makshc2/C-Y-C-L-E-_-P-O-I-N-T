@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "change": "responsive-marketing-layout",
+  "createdAt": "2026-09-02T08:00:00.008Z",
+  "updatedAt": "2026-09-02T08:00:00.008Z",
+  "archivedAt": null,
+  "spend": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "costUsd": null,
+    "costUsdEstimated": null
+  },
+  "spendByPlatform": {
+    "cursor": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": null,
+      "source": "none"
+    },
+    "claude": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": null,
+      "source": "none"
+    },
+    "amp": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": null,
+      "source": "none"
+    }
+  },
+  "spendByModel": [],
+  "totals": {
+    "sessions": 0,
+    "durationMs": null,
+    "leadTimeMs": null,
+    "cloudSessions": 0
+  },
+  "phases": {},
+  "sessions": [],
+  "pending": {
+    "startedAt": "2026-09-02T08:00:00.008Z",
+    "role": "Implementer (parent-driven з `tasks.md` + `apply-notes.md`; `design-implementer` не обов’язковий — Design: none)",
+    "platform": "cursor",
+    "threadId": "04ce2ce6-2914-420d-a559-57ca92bbc1e5",
+    "clientSource": "cursor-env"
+  }
+}

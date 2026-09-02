@@ -3,6 +3,7 @@ import { INSTAGRAM_URL, WORKSHOP_PRICE_SHEET_SRC } from '@/constants/site'
 import { workshopCopy } from '@/content/workshop'
 import SitePagePreloader from '@/components/site/SitePagePreloader.vue'
 import { useEmbedReady } from '@/composables/useEmbedReady'
+import instagramIcon from '@/assets/site/icon-instagram.svg'
 
 const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
 </script>
@@ -12,14 +13,20 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
     <SitePagePreloader :show="!ready" />
     <h1 class="workshop__heading">{{ workshopCopy.heading }}</h1>
     <a
-      class="workshop__url"
+      class="workshop__contact"
       :href="INSTAGRAM_URL"
       target="_blank"
       rel="noopener noreferrer"
     >
-      {{ workshopCopy.instagramLabel }}
+      <img
+        class="workshop__ig"
+        :src="instagramIcon"
+        width="50"
+        height="50"
+        alt=""
+      >
+      <span>{{ workshopCopy.instagramContact }}</span>
     </a>
-    <p class="workshop__intro">{{ workshopCopy.servicesIntro }}</p>
     <div class="workshop__sheet">
       <iframe
         v-if="embedSrc"
@@ -45,10 +52,7 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
   color: var(--color-fg);
 }
 
-.workshop__heading,
-.workshop__url,
-.workshop__intro,
-.workshop__note {
+.workshop__heading {
   margin: 0;
   font-family: Helvetica, var(--font-sans);
   font-size: var(--text-section-title);
@@ -56,18 +60,27 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
   line-height: 1.2;
 }
 
-.workshop__url {
+.workshop__contact {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
   color: inherit;
-  word-break: break-all;
+  font-family: Helvetica, var(--font-sans);
+  font-size: var(--text-contact-title);
+  font-weight: var(--font-weight-light);
+  line-height: 1.2;
 }
 
-.workshop__url:focus-visible {
+.workshop__ig {
+  width: var(--ig-icon);
+  height: var(--ig-icon);
+  flex-shrink: 0;
+}
+
+.workshop__contact:focus-visible {
   outline: 2px solid var(--color-fg);
   outline-offset: 2px;
-}
-
-.workshop__note {
-  margin-top: 16px;
 }
 
 .workshop__sheet {
@@ -92,7 +105,7 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
     padding: 32px 16px 48px;
   }
 
-  .workshop__url {
+  .workshop__contact {
     margin-top: 32px;
   }
 }
@@ -103,9 +116,7 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
   }
 
   .workshop__heading,
-  .workshop__url,
-  .workshop__intro,
-  .workshop__note {
+  .workshop__contact {
     padding-inline: 16px;
   }
 
