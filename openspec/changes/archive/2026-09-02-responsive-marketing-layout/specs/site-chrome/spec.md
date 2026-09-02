@@ -21,7 +21,7 @@
 ## MODIFIED Requirements
 
 ### Requirement: Hash-router і публічні маршрути
-Система MUST використовувати hash-router з `base` `/C-Y-C-L-E-_-P-O-I-N-T/` і MUST відкривати маркетингові сторінки за англійськими слагами: `/` (головна), `/projects`, `/projects/golden-sprints`, `/projects/army-support`, `/workshop`, `/rental`, `/events`, `/artifacts`, `/charity`. Ця зміна MUST NOT додавати нові слагами поза вже існуючими маршрутами роутера.
+Система MUST використовувати hash-router з `base` `/C-Y-C-L-E-_-P-O-I-N-T/` і MUST відкривати маркетингові сторінки за англійськими слагами: `/` (головна), `/projects`, `/projects/golden-sprints`, `/projects/army-support`, `/projects/fishky-velodorizhky`, `/workshop`, `/rental`, `/events`, `/artifacts`, `/charity`. Ця зміна MUST NOT додавати нові слагами поза вже існуючими маршрутами роутера.
 
 #### Scenario: Відкриття головної
 - **GIVEN** користувач заходить на корінь додатка
@@ -35,6 +35,10 @@
 #### Scenario: Існуюча сторінка подій
 - **WHEN** користувач переходить на `/events`
 - **THEN** відображається вже існуюча маркетингова сторінка подій зі спільним site chrome
+
+#### Scenario: Сторінка Фішки велодоріжки
+- **WHEN** користувач переходить на `/projects/fishky-velodorizhky`
+- **THEN** відображається маркетингова сторінка Фішок зі спільним site chrome
 
 ---
 

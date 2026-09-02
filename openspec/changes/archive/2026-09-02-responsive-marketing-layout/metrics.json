@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "change": "responsive-marketing-layout",
+  "createdAt": "2026-09-02T08:00:00.008Z",
+  "updatedAt": "2026-09-02T10:12:59.848Z",
+  "archivedAt": "2026-09-02T10:12:59.848Z",
+  "spend": {
+    "inputTokens": 7899093,
+    "outputTokens": 49497,
+    "totalTokens": 7948590,
+    "costUsd": null,
+    "costUsdEstimated": 19.6816
+  },
+  "spendByPlatform": {
+    "cursor": {
+      "inputTokens": 7899093,
+      "outputTokens": 49497,
+      "totalTokens": 7948590,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": 19.6816,
+      "source": "cursor-hook"
+    },
+    "claude": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": null,
+      "source": "none"
+    },
+    "amp": {
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": null,
+      "source": "none"
+    }
+  },
+  "spendByModel": [
+    {
+      "model": "cursor-grok-4.6-xhigh-fast",
+      "platform": "cursor",
+      "inputTokens": 7899093,
+      "outputTokens": 49497,
+      "totalTokens": 7948590,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": 19.6816
+    }
+  ],
+  "totals": {
+    "sessions": 1,
+    "durationMs": 7979840,
+    "leadTimeMs": 7979840,
+    "cloudSessions": 0
+  },
+  "phases": {
+    "archive": {
+      "sessions": 1,
+      "durationMs": 7979840,
+      "inputTokens": 7899093,
+      "outputTokens": 49497,
+      "totalTokens": 7948590,
+      "costUsd": null,
+      "costUsdEstimated": 19.6816,
+      "agents": [
+        "Archiver"
+      ],
+      "models": [
+        "cursor-grok-4.6-xhigh-fast"
+      ]
+    }
+  },
+  "sessions": [
+    {
+      "startedAt": "2026-09-02T08:00:00.008Z",
+      "endedAt": "2026-09-02T10:12:59.848Z",
+      "durationMs": 7979840,
+      "role": "Archiver",
+      "phase": "archive",
+      "runtime": "local",
+      "agentId": "none",
+      "model": "cursor-grok-4.6-xhigh-fast",
+      "platform": "cursor",
+      "threadId": "101af623-8960-4608-963b-787afcb2e55d",
+      "tasks": "22/22",
+      "sources": [
+        {
+          "id": "a91bee25-ddc3-41f5-8969-8835aa5cf4f8",
+          "platform": "cursor",
+          "model": "cursor-grok-4.6-xhigh-fast",
+          "inputTokens": 1928664,
+          "outputTokens": 16166,
+          "totalTokens": 1944830,
+          "costUsd": null,
+          "ampCredits": null,
+          "at": "2026-09-02T09:21:55.007Z",
+          "cacheReadTokens": 1678848,
+          "costUsdEstimated": 5.7442,
+          "costSource": "api-estimate"
+        },
+        {
+          "id": "a2bd166d-6226-4838-9ccc-a7afb7ce47e5",
+          "platform": "cursor",
+          "model": "cursor-grok-4.6-xhigh-fast",
+          "inputTokens": 2252738,
+          "outputTokens": 17566,
+          "totalTokens": 2270304,
+          "costUsd": null,
+          "ampCredits": null,
+          "at": "2026-09-02T09:31:37.001Z",
+          "cacheReadTokens": 2106112,
+          "costUsdEstimated": 5.8068,
+          "costSource": "api-estimate"
+        },
+        {
+          "id": "85b9a04a-d0d4-41cc-a5f4-6a83380b5959",
+          "platform": "cursor",
+          "model": "cursor-grok-4.6-xhigh-fast",
+          "inputTokens": 284739,
+          "outputTokens": 1742,
+          "totalTokens": 286481,
+          "costUsd": null,
+          "ampCredits": null,
+          "at": "2026-09-02T09:50:27.174Z",
+          "cacheReadTokens": 275328,
+          "costUsdEstimated": 0.6678,
+          "costSource": "api-estimate"
+        },
+        {
+          "id": "ef459ca3-bc2b-4ae7-9a16-5e62afc35d07",
+          "platform": "cursor",
+          "model": "cursor-grok-4.6-xhigh-fast",
+          "inputTokens": 3432952,
+          "outputTokens": 14023,
+          "totalTokens": 3446975,
+          "costUsd": null,
+          "ampCredits": null,
+          "at": "2026-09-02T09:57:57.530Z",
+          "cacheReadTokens": 3389568,
+          "costUsdEstimated": 7.4628,
+          "costSource": "api-estimate"
+        }
+      ],
+      "inputTokens": 7899093,
+      "outputTokens": 49497,
+      "totalTokens": 7948590,
+      "costUsd": null,
+      "ampCredits": null,
+      "costUsdEstimated": 19.6816,
+      "spendSource": "adapter"
+    }
+  ],
+  "pending": null
+}
