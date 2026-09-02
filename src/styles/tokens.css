@@ -27,7 +27,7 @@
   --text-icon-label: 36px;
   --text-contact-title: 32px;
   --text-contact: 28px;
-  --text-footer: 16px;
+  --text-footer: 12px;
   --text-section-title: 36px;
   --text-h1-display: 96px;
   --text-project-title: 36px;
@@ -54,9 +54,10 @@
   --icon-rental-glyph: 239px;
   --map-w: 596px;
   --map-h: 374px;
-  --footer-h: 163px;
-  --danish-logo-w: 175px;
-  --danish-logo-h: 85px;
+  --footer-h: 120px;
+  --footer-inset-x: 1034px;
+  --danish-logo-w: 115px;
+  --danish-logo-h: 56px;
   --charity-btn-w: 152px;
   --charity-btn-h: 40px;
   --capsule-events-w: 698px;

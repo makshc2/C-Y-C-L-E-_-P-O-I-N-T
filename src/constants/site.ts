@@ -11,8 +11,6 @@ export const WORKSHOP_PRICE_SHEET_SRC =
 export const CHARITY_RESULTS_SHEET_SRC =
   'https://docs.google.com/spreadsheets/d/1xZ0xpcZdbfgJJAIpr9FvPthXycFrIlzFFMQI8Jr_Rvs/preview?gid=0&rm=minimal&range=A1:F80'
 
-export const COPYRIGHT_PATHS = ['/', '/charity'] as const
-
 export type GeoPoint = {
   lat: number
   lng: number

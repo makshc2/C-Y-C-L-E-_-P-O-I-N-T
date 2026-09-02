@@ -27,4 +27,5 @@ export const homeCapsuleLabels = {
   projects: 'Проєкти',
 } as const
 
-export const footerSupportText = 'За підтримки Українсько - Данського молодіжного дому'
+export const footerSupportText =
+  'За підтримки Українсько - \nДанського молодіжного дому'

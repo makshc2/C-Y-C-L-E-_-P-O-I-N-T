@@ -22,8 +22,9 @@ import SiteLangToggle from './SiteLangToggle.vue'
 .site-header {
   height: var(--header-h);
   background-color: var(--color-bg);
-  position: relative;
-  z-index: 2;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .site-header__inner {
