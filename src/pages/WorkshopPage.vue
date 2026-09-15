@@ -47,13 +47,14 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
   flex-direction: column;
   height: auto;
   min-height: var(--section-h-home);
-  padding: 142px var(--gutter) 40px;
+  padding: var(--section-pad-y) var(--gutter) var(--section-pad-y);
   background-color: var(--color-green);
   color: var(--color-fg);
 }
 
 .workshop__heading {
   margin: 0;
+  padding-bottom: 120px;
   font-family: Helvetica, var(--font-sans);
   font-size: var(--text-section-title);
   font-weight: var(--font-weight-light);
@@ -63,8 +64,9 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
 .workshop__contact {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 32px;
   margin: 0;
+  margin-left: var(--content-indent);
   color: inherit;
   font-family: Helvetica, var(--font-sans);
   font-size: var(--text-contact-title);
@@ -88,13 +90,14 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
   display: block;
   width: 100%;
   min-height: 70vh;
-  margin-top: 16px;
+  margin-top: var(--section-pad-y);
+  margin-left: var(--content-indent);
 }
 
 .workshop__sheet-frame {
   position: absolute;
   inset: 0;
-  width: 60%;
+  width: var(--sheet-w);
   height: 100%;
   border: 0;
 }
@@ -106,7 +109,13 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
   }
 
   .workshop__contact {
+    gap: 16px;
     margin-top: 32px;
+    margin-left: 0;
+  }
+
+  .workshop__sheet {
+    margin-left: 0;
   }
 }
 

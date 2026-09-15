@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SiteBackLink from '@/components/site/SiteBackLink.vue'
 import { fishkyVelodorizhky } from '@/content/fishkyVelodorizhky'
-import photoUrl from '@/assets/site/fishky-velodorizhky-photo.png'
+import photoUrl from '@/assets/site/fishky-card-photo.png'
 </script>
 
 <template>
@@ -10,8 +10,8 @@ import photoUrl from '@/assets/site/fishky-velodorizhky-photo.png'
     <img
       class="fishky__photo"
       :src="photoUrl"
-      width="516"
-      height="682"
+      width="507"
+      height="810"
       alt="Мапа Києва — Фішки велодоріжки"
     >
     <div class="fishky__copy">
@@ -26,10 +26,10 @@ import photoUrl from '@/assets/site/fishky-velodorizhky-photo.png'
 <style scoped>
 .fishky {
   display: grid;
-  grid-template-columns: var(--gs-photo-w) minmax(0, 786px);
+  grid-template-columns: var(--fishky-photo-w) minmax(0, 786px);
   grid-template-rows: max-content 1fr;
   align-content: start;
-  column-gap: 133px;
+  column-gap: 138px;
   min-height: 1251px;
   padding: 34px 148px 0 145px;
   background-color: var(--color-violet);
@@ -46,8 +46,8 @@ import photoUrl from '@/assets/site/fishky-velodorizhky-photo.png'
 .fishky__photo {
   grid-column: 1;
   grid-row: 2;
-  width: var(--gs-photo-w);
-  height: var(--gs-photo-h);
+  width: var(--fishky-photo-w);
+  height: var(--fishky-photo-h);
   object-fit: cover;
 }
 
@@ -58,7 +58,7 @@ import photoUrl from '@/assets/site/fishky-velodorizhky-photo.png'
 }
 
 .fishky__title {
-  margin: 0 0 72px;
+  margin: 0 0 63px;
   font-family: Helvetica, var(--font-sans);
   font-size: var(--text-h1-display);
   font-weight: var(--font-weight-light);

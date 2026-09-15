@@ -31,7 +31,7 @@ defineProps<{
 }
 
 .site-back--lime {
-  color: var(--color-fg);
+  color: var(--color-section-title);
 }
 
 .site-back--violet:focus-visible {

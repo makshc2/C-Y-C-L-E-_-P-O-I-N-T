@@ -34,13 +34,13 @@ const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
   width: 100%;
   height: auto;
   min-height: var(--army-stripe-h);
-  padding: 142px var(--gutter) 40px;
+  padding: 34px var(--gutter) var(--section-pad-y);
   background-color: var(--color-green);
   color: var(--color-fg);
 }
 
 .army :deep(.site-back) {
-  margin: 0 0 16px;
+  margin: 0 0 54px;
 }
 
 .army__heading {
@@ -56,13 +56,14 @@ const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
   display: block;
   width: 100%;
   min-height: 70vh;
-  margin-top: 16px;
+  margin-top: var(--section-pad-y);
+  margin-left: var(--content-indent);
 }
 
 .army__sheet-frame {
   position: absolute;
   inset: 0;
-  width: 100%;
+  width: var(--sheet-w);
   height: 100%;
   border: 0;
 }
@@ -70,6 +71,10 @@ const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
 @media (max-width: 1279px) {
   .army {
     padding: 32px 16px 48px;
+  }
+
+  .army__sheet {
+    margin-left: 0;
   }
 }
 </style>

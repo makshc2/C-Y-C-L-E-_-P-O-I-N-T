@@ -43,6 +43,11 @@
   --logo-x: 36px;
   --logo-y: 12px;
   --gutter: 149px;
+  --content-indent: 120px;
+  --section-pad-y: 116px;
+  --sheet-w: 68%;
+  --fishky-photo-w: 507px;
+  --fishky-photo-h: 810px;
   --section-h-home: 480px;
   --icon-hit-workshop-w: 530px;
   --icon-hit-workshop-h: 415px;
@@ -75,8 +80,8 @@
   --rental-photo-h: 362px;
   --rental-row-gap: 219px;
   --charity-green-h: 1440px;
-  --charity-qr-w: 566px;
-  --charity-qr-h: 528px;
+  --charity-qr-w: 255px;
+  --charity-qr-h: 238px;
   --army-stripe-h: 480px;
 
   --radius-pill: 60px;

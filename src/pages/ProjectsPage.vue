@@ -3,6 +3,8 @@ import ProjectRow from '@/components/projects/ProjectRow.vue'
 import { armySupportList, goldenSprintsList } from '@/content/projects'
 import gsThumb from '@/assets/site/gs-thumb.png'
 import armyThumb from '@/assets/site/army-thumb.png'
+import fishkyCardPhoto from '@/assets/site/fishky-card-photo.png'
+import { fishkyVelodorizhky } from '@/content/fishkyVelodorizhky'
 </script>
 
 <template>
@@ -28,6 +30,14 @@ import armyThumb from '@/assets/site/army-thumb.png'
       <p>{{ armySupportList.body }}</p>
     </ProjectRow>
     <div class="projects__rule" />
+    <ProjectRow
+      :photo="fishkyCardPhoto"
+      photo-alt="Фішки велодоріжки"
+      :title="fishkyVelodorizhky.title"
+      to="/projects/fishky-velodorizhky"
+    >
+      <p>{{ fishkyVelodorizhky.paragraphs[0] }}</p>
+    </ProjectRow>
   </div>
 </template>
 
