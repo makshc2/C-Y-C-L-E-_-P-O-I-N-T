@@ -2,13 +2,13 @@
   "version": 1,
   "change": "align-pages-with-figma",
   "createdAt": "2026-09-15T18:57:47.496Z",
-  "updatedAt": "2026-09-15T21:40:03.305Z",
-  "archivedAt": null,
+  "updatedAt": "2026-09-15T21:50:54.910Z",
+  "archivedAt": "2026-09-15T21:50:54.910Z",
   "spend": {
     "inputTokens": null,
     "outputTokens": null,
     "totalTokens": null,
-    "costUsd": 0.068,
+    "costUsd": 0.10200000000000001,
     "costUsdEstimated": null
   },
   "spendByPlatform": {
@@ -25,7 +25,7 @@
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
-      "costUsd": 0.068,
+      "costUsd": 0.10200000000000001,
       "ampCredits": null,
       "costUsdEstimated": null,
       "source": "none"
@@ -77,15 +77,15 @@
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
-      "costUsd": 0.034,
+      "costUsd": 0.068,
       "ampCredits": null,
       "costUsdEstimated": null
     }
   ],
   "totals": {
-    "sessions": 7,
-    "durationMs": 5891412,
-    "leadTimeMs": 9609820,
+    "sessions": 8,
+    "durationMs": 5979169,
+    "leadTimeMs": 10261425,
     "cloudSessions": 0
   },
   "phases": {
@@ -163,6 +163,23 @@
       "costUsdEstimated": null,
       "agents": [
         "apply (conductor"
+      ],
+      "models": [
+        "claude-opus-5[1m]",
+        "GPT-5.6 Luna",
+        "GLM-5.3-Flash"
+      ]
+    },
+    "archive": {
+      "sessions": 1,
+      "durationMs": 87757,
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": 0.034,
+      "costUsdEstimated": null,
+      "agents": [
+        "Archiver"
       ],
       "models": [
         "claude-opus-5[1m]",
@@ -339,6 +356,62 @@
       "durationMs": 756135,
       "role": "apply (conductor",
       "phase": "apply",
+      "runtime": "local",
+      "agentId": "none",
+      "model": "claude-opus-5[1m]",
+      "platform": "claude",
+      "threadId": null,
+      "tasks": "11/11",
+      "sources": [],
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "costUsd": 0.034,
+      "ampCredits": null,
+      "costUsdEstimated": null,
+      "spendSource": "amp-usage",
+      "models": [
+        "GPT-5.6 Luna",
+        "GLM-5.3-Flash"
+      ],
+      "agentMode": "high",
+      "usageModels": [
+        {
+          "model": "GPT-5.6 Luna",
+          "requests": 1,
+          "inputTokens": 2037,
+          "outputTokens": 20,
+          "costUsd": 0.002
+        },
+        {
+          "model": "GLM-5.3-Flash",
+          "requests": 2,
+          "inputTokens": 65905,
+          "outputTokens": 66,
+          "costUsd": 0.02
+        },
+        {
+          "model": "GPT-5.6 Luna",
+          "requests": 1,
+          "inputTokens": 270,
+          "outputTokens": 23,
+          "costUsd": 0.002
+        },
+        {
+          "model": "GPT-5.6 Luna",
+          "requests": 1,
+          "inputTokens": 2037,
+          "outputTokens": 20,
+          "costUsd": 0.002
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-09-15T21:49:27.153Z",
+      "endedAt": "2026-09-15T21:50:54.910Z",
+      "durationMs": 87757,
+      "role": "Archiver",
+      "phase": "archive",
       "runtime": "local",
       "agentId": "none",
       "model": "claude-opus-5[1m]",
