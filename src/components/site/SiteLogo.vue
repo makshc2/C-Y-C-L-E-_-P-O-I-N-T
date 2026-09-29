@@ -9,7 +9,7 @@ import logoUrl from '@/assets/site/logo-cyclepoint-header.png'
       class="site-logo__img"
       :src="logoUrl"
       width="385"
-      height="56"
+      height="60"
       alt="cyclepoint"
     >
   </RouterLink>

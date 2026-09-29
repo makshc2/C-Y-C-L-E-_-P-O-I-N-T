@@ -7,7 +7,11 @@ import photoUrl from '@/assets/site/home-projects-photo.png'
 <template>
   <RouterLink class="capsule" to="/projects">
     <img class="capsule__photo" :src="photoUrl" alt="">
-    <span class="capsule__blur" />
+    <span class="capsule__blur" aria-hidden="true">
+      <span class="capsule__blur-layer">
+        <img class="capsule__blur-photo" :src="photoUrl" alt="">
+      </span>
+    </span>
     <span class="capsule__label">{{ homeCapsuleLabels.projects }}</span>
   </RouterLink>
 </template>
@@ -32,20 +36,37 @@ import photoUrl from '@/assets/site/home-projects-photo.png'
 .capsule__blur {
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: 6px;
   width: var(--capsule-hover-w);
   height: var(--capsule-projects-hover-h);
   transform: translateX(-50%);
+  overflow: hidden;
   border-radius: var(--radius-capsule);
-  border-width: 1.5px;
-  border-style: solid;
-  border-color: rgb(255 255 255 / 0.2);
-  background-color: rgb(255 255 255 / var(--blur-capsule-hover-opacity));
-  backdrop-filter: blur(var(--blur-projects));
-  -webkit-backdrop-filter: blur(var(--blur-projects));
+  border: 0.5px solid rgb(255 255 255 / 0.2);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+.capsule__blur-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: var(--blur-capsule-hover-opacity);
+  backdrop-filter: blur(var(--blur-projects));
+  -webkit-backdrop-filter: blur(var(--blur-projects));
+  pointer-events: none;
+}
+
+.capsule__blur-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center bottom;
 }
 
 .capsule__label {
@@ -102,7 +123,7 @@ import photoUrl from '@/assets/site/home-projects-photo.png'
   }
 
   .capsule__blur {
-    width: min(var(--capsule-hover-w), 90%);
+    width: min(var(--capsule-hover-w), 86%);
   }
 
   .capsule__label {

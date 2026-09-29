@@ -39,7 +39,7 @@
   --space-basis: 8px;
   --header-h: 78px;
   --logo-w: 385px;
-  --logo-h: 56px;
+  --logo-h: 60px;
   --logo-x: 36px;
   --logo-y: 12px;
   --gutter: 149px;
@@ -69,7 +69,7 @@
   --capsule-projects-w: 699px;
   --capsule-default-h: 120px;
   --capsule-hover-w: 440px;
-  --capsule-projects-hover-h: 120px;
+  --capsule-projects-hover-h: 112px;
   --ig-icon: 50px;
   --artifact-photo-w: 400px;
   --artifact-photo-h: 392px;
@@ -88,7 +88,7 @@
   --radius-capsule: 100px;
   --border-capsule: 1.5px solid rgba(255, 255, 255, 0.2);
   --shadow-capsule-label: 0px 4px 4px rgba(30, 30, 30, 0.25);
-  --blur-projects: 3.85px;
+  --blur-projects: 1.35px;
   --blur-projects-opacity: 0.20;
   --blur-capsule-hover-opacity: 0.15;
 

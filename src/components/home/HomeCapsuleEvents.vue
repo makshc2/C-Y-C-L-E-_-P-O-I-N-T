@@ -2,12 +2,17 @@
 import { RouterLink } from 'vue-router'
 import { homeCapsuleLabels } from '@/content/home'
 import photoUrl from '@/assets/site/home-events-photo.png'
+import blurPhotoUrl from '@/assets/site/home-events-blur.jpg'
 </script>
 
 <template>
   <RouterLink class="capsule" to="/events">
     <img class="capsule__photo" :src="photoUrl" alt="">
-    <span class="capsule__blur" />
+    <span class="capsule__blur" aria-hidden="true">
+      <span class="capsule__blur-layer">
+        <img class="capsule__blur-photo" :src="blurPhotoUrl" alt="">
+      </span>
+    </span>
     <span class="capsule__label">{{ homeCapsuleLabels.events }}</span>
   </RouterLink>
 </template>
@@ -32,20 +37,36 @@ import photoUrl from '@/assets/site/home-events-photo.png'
 .capsule__blur {
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: 6px;
   width: var(--capsule-hover-w);
   height: var(--capsule-projects-hover-h);
   transform: translateX(-50%);
+  overflow: hidden;
   border-radius: var(--radius-capsule);
-  border-width: 1.5px;
-  border-style: solid;
-  border-color: rgb(255 255 255 / 0.2);
-  background-color: rgb(255 255 255 / var(--blur-capsule-hover-opacity));
-  backdrop-filter: blur(var(--blur-projects));
-  -webkit-backdrop-filter: blur(var(--blur-projects));
+  border: 0.5px solid rgb(255 255 255 / 0.2);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+}
+
+.capsule__blur-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: var(--blur-capsule-hover-opacity);
+  backdrop-filter: blur(var(--blur-projects));
+  -webkit-backdrop-filter: blur(var(--blur-projects));
+  pointer-events: none;
+}
+
+.capsule__blur-photo {
+  position: absolute;
+  left: -29.23%;
+  top: -378.83%;
+  width: 197.1%;
+  height: 491.82%;
+  max-width: none;
 }
 
 .capsule__label {
@@ -102,7 +123,7 @@ import photoUrl from '@/assets/site/home-events-photo.png'
   }
 
   .capsule__blur {
-    width: min(var(--capsule-hover-w), 90%);
+    width: min(var(--capsule-hover-w), 86%);
   }
 
   .capsule__label {
