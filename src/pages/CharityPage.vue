@@ -221,4 +221,29 @@ import { charityCopy } from '@/content/charity'
     font-size: var(--text-body);
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .charity__intro,
+  .charity__impact,
+  .charity__contacts {
+    padding: 64px 40px;
+  }
+
+  .charity__row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 40px;
+    margin-top: 48px;
+  }
+
+  .charity__qr-block {
+    margin-left: 0;
+  }
+
+  .charity__lead {
+    flex: 1 1 320px;
+    max-width: none;
+  }
+}
 </style>

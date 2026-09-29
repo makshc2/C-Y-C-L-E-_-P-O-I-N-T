@@ -139,4 +139,30 @@ import photoUrl from '@/assets/site/home-projects-photo.png'
     text-align: center;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .capsule {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    flex-shrink: 1;
+    aspect-ratio: 699 / 480;
+  }
+
+  .capsule__blur {
+    width: min(var(--capsule-hover-w), 78%);
+    height: 32%;
+  }
+
+  .capsule__label {
+    left: 8%;
+    right: 8%;
+    top: auto;
+    bottom: 8%;
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.15;
+    white-space: normal;
+    text-align: center;
+  }
+}
 </style>

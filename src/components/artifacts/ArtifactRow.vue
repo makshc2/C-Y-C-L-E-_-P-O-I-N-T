@@ -67,4 +67,24 @@ defineProps<{
     height: auto;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .artifact-row {
+    grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
+    column-gap: 32px;
+    min-height: 0;
+    padding: 48px 40px;
+  }
+
+  .artifact-row__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 400 / 392;
+  }
+
+  .artifact-row__text {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+}
 </style>

@@ -77,4 +77,23 @@ const { ready, embedSrc, markReady } = useEmbedReady(CHARITY_RESULTS_SHEET_SRC)
     margin-left: 0;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .army {
+    padding: 40px 40px 56px;
+  }
+
+  .army :deep(.site-back) {
+    margin-bottom: 32px;
+  }
+
+  .army__sheet {
+    margin-top: 40px;
+    margin-left: 0;
+  }
+
+  .army__sheet-frame {
+    width: 100%;
+  }
+}
 </style>

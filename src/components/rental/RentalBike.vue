@@ -61,4 +61,26 @@ defineProps<{
     height: auto;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .rental-bike {
+    grid-template-columns: minmax(200px, 42%) minmax(0, 1fr);
+    column-gap: 28px;
+    padding: 0 40px;
+  }
+
+  .rental-bike__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 636 / 362;
+  }
+
+  .rental-bike__name {
+    font-size: 32px;
+  }
+
+  .rental-bike__spec {
+    font-size: 22px;
+  }
+}
 </style>

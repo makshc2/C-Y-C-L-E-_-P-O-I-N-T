@@ -37,4 +37,12 @@ import logoUrl from '@/assets/site/logo-cyclepoint-header.png'
     height: auto;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .site-logo,
+  .site-logo__img {
+    width: 260px;
+    height: auto;
+  }
+}
 </style>

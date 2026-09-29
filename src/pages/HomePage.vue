@@ -623,4 +623,102 @@ const directionsUrl = getVenueDirectionsUrl()
     grid-row: auto;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .home-intro .home-frame,
+  .home-community .home-frame,
+  .home-services .home-frame,
+  .home-contacts .home-frame {
+    padding-inline: 32px;
+    gap: 24px;
+  }
+
+  .home-intro .home-frame,
+  .home-community .home-frame {
+    align-items: center;
+    min-height: 0;
+  }
+
+  .home-intro .home-intro__capsule,
+  .home-community .home-community__capsule {
+    flex: 1 1 44%;
+    width: 44%;
+    max-width: 520px;
+    min-width: 0;
+    height: auto;
+  }
+
+  .home-intro__text,
+  .home-community__text {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .home-services .home-frame {
+    flex-wrap: nowrap;
+    align-items: stretch;
+    padding-block: 40px 48px;
+    min-height: 0;
+  }
+
+  .home-services__workshop,
+  .home-services__rental,
+  .home-services__artifacts {
+    flex: 1 1 0;
+    width: auto;
+    height: auto;
+  }
+
+  .home-services__workshop :deep(.tile),
+  .home-services__rental :deep(.tile),
+  .home-services__artifacts :deep(.tile) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 0;
+    padding: 8px 8px 0;
+  }
+
+  .home-services__workshop :deep(.tile__icon),
+  .home-services__rental :deep(.tile__icon),
+  .home-services__artifacts :deep(.tile__icon) {
+    position: static;
+    left: auto;
+    top: auto;
+    width: min(140px, 18vw);
+    height: auto;
+  }
+
+  .home-services__workshop :deep(.tile__label),
+  .home-services__rental :deep(.tile__label),
+  .home-services__artifacts :deep(.tile__label) {
+    position: static;
+    left: auto;
+    top: auto;
+    margin-top: 16px;
+    font-size: 22px;
+    line-height: 26px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .home-contacts .home-frame {
+    min-height: 0;
+    padding-block: 32px;
+  }
+
+  .home-contacts__title,
+  .home-contacts__hours {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .home-contacts__note,
+  .home-contacts__address,
+  .home-contacts__phone,
+  .home-contacts__email {
+    font-size: 20px;
+    line-height: 26px;
+  }
+}
 </style>

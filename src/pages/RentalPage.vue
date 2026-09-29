@@ -105,4 +105,21 @@ const catalog = rentalBikes.map((bike) => ({
     padding: 48px 0;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .rental-intro {
+    min-height: 0;
+    padding: 48px 40px 56px;
+  }
+
+  .rental-intro__body {
+    margin-left: 0;
+    max-width: 42rem;
+  }
+
+  .rental-list {
+    gap: 56px;
+    padding: 56px 0;
+  }
+}
 </style>

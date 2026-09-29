@@ -82,4 +82,10 @@ const { ready, embedSrc, markReady } = useEmbedReady(EVENTS_INSTAGRAM_EMBED_SRC)
     padding: 32px 16px 48px;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .events {
+    padding: 40px 40px 48px;
+  }
+}
 </style>

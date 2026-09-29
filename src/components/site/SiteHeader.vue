@@ -142,4 +142,31 @@ const sectionTitle = computed(() => {
     margin: 0;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .site-header__inner {
+    padding: 16px 32px 12px;
+    row-gap: 8px;
+  }
+
+  .site-header__title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 38px;
+    text-align: center;
+  }
+
+  .site-header__inner:has(.site-header__title) .site-header__right {
+    margin-left: auto;
+  }
+
+  .site-header__right {
+    gap: 12px 20px;
+  }
+
+  .site-header__charity {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+}
 </style>

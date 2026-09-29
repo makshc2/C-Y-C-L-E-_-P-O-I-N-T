@@ -189,4 +189,39 @@ import photoUrl from '@/assets/site/gs-detail-photo.png'
     font-size: clamp(40px, 12vw, 96px);
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .gs {
+    grid-template-columns: minmax(220px, 38%) minmax(0, 1fr);
+    column-gap: 32px;
+    padding: 32px 40px 64px;
+  }
+
+  .gs > :deep(.site-back) {
+    margin-bottom: 28px;
+  }
+
+  .gs__photo {
+    width: 100%;
+    height: auto;
+  }
+
+  .gs__title {
+    margin-bottom: 28px;
+    font-size: clamp(40px, 5vw, 72px);
+  }
+
+  .gs__copy p,
+  .gs__setup p,
+  .gs__how p,
+  .gs__setup li,
+  .gs__how li {
+    max-width: none;
+  }
+
+  .gs__setup,
+  .gs__how {
+    margin-top: 48px;
+  }
+}
 </style>

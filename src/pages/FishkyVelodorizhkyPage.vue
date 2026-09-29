@@ -104,4 +104,32 @@ import photoUrl from '@/assets/site/fishky-card-photo.png'
     font-size: clamp(40px, 12vw, 96px);
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .fishky {
+    grid-template-columns: minmax(200px, 36%) minmax(0, 1fr);
+    column-gap: 32px;
+    min-height: 0;
+    padding: 32px 40px 64px;
+  }
+
+  .fishky > :deep(.site-back) {
+    margin-bottom: 28px;
+  }
+
+  .fishky__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 507 / 810;
+  }
+
+  .fishky__title {
+    margin-bottom: 28px;
+    font-size: clamp(40px, 5vw, 72px);
+  }
+
+  .fishky__copy p {
+    max-width: none;
+  }
+}
 </style>

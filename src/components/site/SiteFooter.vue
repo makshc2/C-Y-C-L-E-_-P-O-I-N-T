@@ -64,4 +64,10 @@ import { footerSupportText } from '@/content/home'
     padding-left: 16px;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .site-footer__inner {
+    padding-left: 40px;
+  }
+}
 </style>

@@ -47,4 +47,11 @@ import { RouterLink } from 'vue-router'
     gap: 12px 24px;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .site-nav {
+    flex-wrap: nowrap;
+    gap: 16px 24px;
+  }
+}
 </style>

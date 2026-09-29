@@ -138,4 +138,27 @@ const { ready, embedSrc, markReady } = useEmbedReady(WORKSHOP_PRICE_SHEET_SRC)
     width: 100%;
   }
 }
+
+@media (min-width: 768px) and (max-width: 1376px) {
+  .workshop {
+    padding: 48px 40px 56px;
+  }
+
+  .workshop__heading {
+    padding-bottom: 48px;
+  }
+
+  .workshop__contact,
+  .workshop__sheet {
+    margin-left: 0;
+  }
+
+  .workshop__sheet {
+    margin-top: 40px;
+  }
+
+  .workshop__sheet-frame {
+    width: 100%;
+  }
+}
 </style>
