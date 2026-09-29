@@ -1,5 +1,21 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+
+function migrateLegacyHash() {
+  const hash = window.location.hash
+  if (!hash.startsWith('#/')) return
+  const rest = hash.slice(2)
+  if (rest.startsWith('#')) {
+    window.history.replaceState(null, '', `/${rest}`)
+    return
+  }
+  const cut = rest.indexOf('#')
+  const path = cut === -1 ? rest : rest.slice(0, cut)
+  const fragment = cut === -1 ? '' : rest.slice(cut)
+  window.history.replaceState(null, '', `/${path}${fragment}`)
+}
+
+migrateLegacyHash()
 
 const routes: RouteRecordRaw[] = [
   {
@@ -69,7 +85,7 @@ const routes: RouteRecordRaw[] = [
 ]
 
 export default createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to) {
     if (to.hash) {
