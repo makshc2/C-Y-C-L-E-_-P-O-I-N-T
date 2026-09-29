@@ -8,7 +8,7 @@ context: |
   UI-тексти та пояснення для користувача — українською.
   Мова агента: uk.
 
-  Фронт: GitHub Pages (base: /C-Y-C-L-E-_-P-O-I-N-T/). Архів гонок — localStorage (ключ races_db_v1)
+  Фронт: cyclepoint.kyiv.ua (nginx, base: /). Збірка викладається з GitHub Actions на пуш у master. Архів гонок — localStorage (ключ races_db_v1)
   або опційно VITE_ARCHIVE_API_URL → Express + SQLite у server/.
 
   Ключові шляхи:
