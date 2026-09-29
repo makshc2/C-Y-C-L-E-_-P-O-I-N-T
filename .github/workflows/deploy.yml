@@ -39,10 +39,46 @@ jobs:
           VITE_ARCHIVE_API_URL: ${{ vars.VITE_ARCHIVE_API_URL }}
         run: npm run build
 
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: dist/
+          retention-days: 1
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
+
+  deploy-host:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download site
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      - name: Sync site to host
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.HOST_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SSH_PRIVATE_KEY}" ]; then
+            echo "Секрет HOST_SSH_KEY не задано"
+            exit 1
+          fi
+          test -f dist/index.html
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/cyclepoint_deploy
+          chmod 600 ~/.ssh/cyclepoint_deploy
+          ssh-keyscan -H cyclepoint.kyiv.ua >> ~/.ssh/known_hosts
+          rsync -az --delete --chmod=D755,F644 \
+            --exclude favicon.ico \
+            -e "ssh -i ~/.ssh/cyclepoint_deploy -o IdentitiesOnly=yes" \
+            dist/ deploy@cyclepoint.kyiv.ua:
 
   deploy:
     needs: build
