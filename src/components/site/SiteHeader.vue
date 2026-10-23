@@ -5,8 +5,10 @@ import SiteLogo from './SiteLogo.vue'
 import SiteNav from './SiteNav.vue'
 import SiteCharityButton from './SiteCharityButton.vue'
 import SiteLangToggle from './SiteLangToggle.vue'
+import { useFishkyMapOpen } from '@/composables/useFishkyMapOpen'
 
 const route = useRoute()
+const { open: fishkyMapOpen } = useFishkyMapOpen()
 
 const sectionTitles: Record<string, string> = {
   '/': 'Велоточка',
@@ -18,6 +20,9 @@ const sectionTitles: Record<string, string> = {
 }
 
 const sectionTitle = computed(() => {
+  if (route.path === '/projects/fishky-velodorizhky' && fishkyMapOpen.value) {
+    return 'Фішки велодоріжки'
+  }
   if (route.path.startsWith('/projects')) return 'Проєкти'
   return sectionTitles[route.path] ?? ''
 })

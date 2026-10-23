@@ -5,7 +5,7 @@
 'use strict';
 
 const { existsSync, readdirSync, readFileSync, writeFileSync, statSync } = require('fs');
-const { join } = require('path');
+const { join, resolve } = require('path');
 
 function numOrNull(value) {
   if (value == null || value === '') return null;
@@ -16,6 +16,23 @@ function numOrNull(value) {
 function addNullable(a, b) {
   if (a == null && b == null) return null;
   return (a ?? 0) + (b ?? 0);
+}
+
+function roundUsd4(x) {
+  if (x == null) return null;
+  return Math.round(Number(x) * 10000) / 10000;
+}
+
+function costUsdTotalOf(obj) {
+  const billed = numOrNull(obj && obj.costUsd);
+  if (billed != null) return billed;
+  return numOrNull(obj && obj.costUsdEstimated);
+}
+
+function timestampMs(value) {
+  if (value == null || value === '') return NaN;
+  const ms = Date.parse(value);
+  return Number.isFinite(ms) ? ms : NaN;
 }
 
 const GROK_46 = {
@@ -85,14 +102,161 @@ function describeCursorCostEstimate(args) {
   };
 }
 
-function resolveBaseDir(payload) {
-  const cwd = process.cwd();
-  if (existsSync(join(cwd, 'openspec', 'changes'))) return cwd;
-  const roots = Array.isArray(payload.workspace_roots) ? payload.workspace_roots : [];
-  for (const root of roots) {
-    if (root && existsSync(join(String(root), 'openspec', 'changes'))) return String(root);
+function uniqueExistingAbsPaths(payload) {
+  const seen = new Set();
+  const out = [];
+  const add = (value) => {
+    if (value == null || value === '') return;
+    let abs;
+    try {
+      abs = resolve(String(value));
+    } catch {
+      return;
+    }
+    if (seen.has(abs)) return;
+    try {
+      if (!existsSync(abs)) return;
+    } catch {
+      return;
+    }
+    seen.add(abs);
+    out.push(abs);
+  };
+  add(process.cwd());
+  const roots = payload && Array.isArray(payload.workspace_roots) ? payload.workspace_roots : [];
+  for (const root of roots) add(root);
+  return out;
+}
+
+function leftoverCandidateRoots(payload) {
+  return uniqueExistingAbsPaths(payload).filter((root) => existsSync(join(root, 'openspec', 'changes')));
+}
+
+function readJsonSafe(filePath) {
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf-8'));
+  } catch {
+    return null;
   }
-  return cwd;
+}
+
+function metricsHasConversationThread(metrics, conversationId) {
+  if (!metrics || typeof metrics !== 'object' || !conversationId) return false;
+  const pendingId = metrics.pending && metrics.pending.threadId != null && metrics.pending.threadId !== ''
+    ? String(metrics.pending.threadId).trim()
+    : '';
+  if (pendingId && pendingId === conversationId) return true;
+  const sessions = Array.isArray(metrics.sessions) ? metrics.sessions : [];
+  const last = sessions[sessions.length - 1];
+  const lastId = last && last.threadId != null && last.threadId !== ''
+    ? String(last.threadId).trim()
+    : '';
+  return Boolean(lastId && lastId === conversationId);
+}
+
+function activeChangeNames(changesDir) {
+  const names = [];
+  let entries;
+  try {
+    entries = readdirSync(changesDir);
+  } catch {
+    return names;
+  }
+  for (const name of entries) {
+    if (name === 'archive') continue;
+    const full = join(changesDir, name);
+    try {
+      if (statSync(full).isDirectory()) names.push(name);
+    } catch {
+      continue;
+    }
+  }
+  return names;
+}
+
+function rootHasMatchingThread(root, conversationId) {
+  const changesDir = join(root, 'openspec', 'changes');
+  if (!existsSync(changesDir)) return false;
+  for (const name of activeChangeNames(changesDir)) {
+    if (metricsHasConversationThread(readJsonSafe(join(changesDir, name, 'metrics.json')), conversationId)) {
+      return true;
+    }
+  }
+  const archiveDir = join(changesDir, 'archive');
+  if (!existsSync(archiveDir)) return false;
+  const seen = new Set();
+  let entries;
+  try {
+    entries = readdirSync(archiveDir);
+  } catch {
+    return false;
+  }
+  for (const entry of entries) {
+    const changeName = archivedChangeName(entry);
+    if (!changeName || seen.has(changeName)) continue;
+    seen.add(changeName);
+    const dir = newestArchiveDirForName(archiveDir, changeName);
+    if (!dir) continue;
+    if (metricsHasConversationThread(readJsonSafe(join(dir, 'metrics.json')), conversationId)) return true;
+  }
+  return false;
+}
+
+function rootHasActiveChange(root) {
+  return activeChangeNames(join(root, 'openspec', 'changes')).length > 0;
+}
+
+function jsonlHasConversationId(root, conversationId) {
+  if (!conversationId) return false;
+  const filePath = join(root, '.agents', 'spend', 'cursor-usage.jsonl');
+  if (!existsSync(filePath)) return false;
+  let text;
+  try {
+    text = readFileSync(filePath, 'utf-8');
+  } catch {
+    return false;
+  }
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue;
+    let row;
+    try {
+      row = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    const id = row && row.conversationId != null && row.conversationId !== ''
+      ? String(row.conversationId).trim()
+      : '';
+    if (id && id === conversationId) return true;
+  }
+  return false;
+}
+
+function resolveBaseDir(payload) {
+  const candidates = uniqueExistingAbsPaths(payload && typeof payload === 'object' ? payload : {});
+  const conversationId = String((payload && payload.conversation_id) || '').trim();
+  if (conversationId) {
+    for (const root of candidates) {
+      if (rootHasMatchingThread(root, conversationId)) return root;
+    }
+  }
+  for (const root of candidates) {
+    if (rootHasActiveChange(root)) return root;
+  }
+  if (conversationId) {
+    for (const root of candidates) {
+      if (jsonlHasConversationId(root, conversationId)) return root;
+    }
+  }
+  const cwd = resolve(process.cwd());
+  if (
+    candidates.includes(cwd)
+    && (existsSync(join(cwd, 'openspec', 'changes')) || existsSync(join(cwd, '.agents')))
+  ) {
+    return cwd;
+  }
+  if (!candidates.length) return cwd;
+  return [...candidates].sort()[0];
 }
 
 const CURSOR_LEFTOVER_GRACE_MS = 120000;
@@ -145,11 +309,13 @@ function dedupeCursorSources(sources) {
 }
 
 function leftoverWindowEnd(metrics, last) {
-  if (metrics.pending && metrics.pending.startedAt) return metrics.pending.startedAt;
   if (!last || !last.endedAt) return null;
   const end = Date.parse(last.endedAt);
   if (!Number.isFinite(end)) return null;
-  return new Date(end + CURSOR_LEFTOVER_GRACE_MS).toISOString();
+  const grace = new Date(end + CURSOR_LEFTOVER_GRACE_MS).toISOString();
+  const pending = metrics.pending && metrics.pending.startedAt;
+  if (!pending || last.threadId) return pending || grace;
+  return Date.parse(pending) < Date.parse(grace) ? pending : grace;
 }
 
 function leftoverEndExclusive(metrics) {
@@ -159,9 +325,7 @@ function leftoverEndExclusive(metrics) {
 function existingIds(metrics) {
   const ids = new Set();
   for (const session of metrics.sessions || []) {
-    for (const src of session.sources || []) {
-      if (src && src.id != null && src.id !== '') ids.add(String(src.id));
-    }
+    for (const id of session.sourceIds || []) ids.add(String(id));
   }
   return ids;
 }
@@ -255,11 +419,11 @@ function sourceTotals(sources) {
     if (src.costUsd != null) costUsd = addNullable(costUsd, numOrNull(src.costUsd));
     costUsdEstimated = addNullable(costUsdEstimated, numOrNull(src.costUsdEstimated));
   }
-  return { inputTokens, outputTokens, totalTokens, costUsd, costUsdEstimated };
+  return { inputTokens, outputTokens, totalTokens, costUsd, costUsdEstimated: roundUsd4(costUsdEstimated) };
 }
 
 function looksOverridden(session) {
-  const fromSources = sourceTotals(session.sources || []);
+  const fromSources = sourceTotals(session.byModel || []);
   return ['inputTokens', 'outputTokens', 'totalTokens', 'costUsd'].some((key) => {
     const sessionVal = numOrNull(session[key]);
     const sourceVal = numOrNull(fromSources[key]);
@@ -277,6 +441,7 @@ function emptyPlatform(source = 'none') {
     costUsd: null,
     ampCredits: null,
     costUsdEstimated: null,
+    costUsdTotal: null,
     source,
   };
 }
@@ -284,7 +449,7 @@ function emptyPlatform(source = 'none') {
 function recompute(metrics) {
   const phases = {};
   const totals = { sessions: 0, durationMs: null, leadTimeMs: null, cloudSessions: 0 };
-  const spend = { inputTokens: null, outputTokens: null, totalTokens: null, costUsd: null, costUsdEstimated: null };
+  const spend = { inputTokens: null, outputTokens: null, totalTokens: null, costUsd: null, costUsdEstimated: null, costUsdTotal: null };
   const byPlatform = {
     cursor: emptyPlatform(),
     claude: emptyPlatform(),
@@ -298,34 +463,48 @@ function recompute(metrics) {
     totals.sessions += 1;
     if (session.runtime === 'cloud') totals.cloudSessions += 1;
     totals.durationMs = addNullable(totals.durationMs, numOrNull(session.durationMs));
-    if (session.startedAt && (firstStart == null || session.startedAt < firstStart)) firstStart = session.startedAt;
-    if (session.endedAt && (lastEnd == null || session.endedAt > lastEnd)) lastEnd = session.endedAt;
+    const sessionStartMs = timestampMs(session.startedAt);
+    if (Number.isFinite(sessionStartMs) && (firstStart == null || sessionStartMs < timestampMs(firstStart))) {
+      firstStart = session.startedAt;
+    }
+    const sessionEndMs = timestampMs(session.endedAt);
+    if (Number.isFinite(sessionEndMs) && (lastEnd == null || sessionEndMs > timestampMs(lastEnd))) {
+      lastEnd = session.endedAt;
+    }
 
     const key = session.phase || 'other';
     const phase = phases[key] || {
       sessions: 0,
       durationMs: null,
+      startedAt: null,
+      endedAt: null,
+      leadTimeMs: null,
       inputTokens: null,
       outputTokens: null,
       totalTokens: null,
       costUsd: null,
       costUsdEstimated: null,
+      costUsdTotal: null,
       agents: [],
       models: [],
     };
     phase.sessions += 1;
     phase.durationMs = addNullable(phase.durationMs, numOrNull(session.durationMs));
+    if (Number.isFinite(sessionStartMs) && (phase.startedAt == null || sessionStartMs < timestampMs(phase.startedAt))) {
+      phase.startedAt = session.startedAt;
+    }
+    if (Number.isFinite(sessionEndMs) && (phase.endedAt == null || sessionEndMs > timestampMs(phase.endedAt))) {
+      phase.endedAt = session.endedAt;
+    }
     for (const spendKey of ['inputTokens', 'outputTokens', 'totalTokens', 'costUsd', 'costUsdEstimated']) {
-      const fromSession = numOrNull(session[spendKey]);
-      let value = fromSession;
-      if (value == null) {
-        let sum = null;
-        for (const src of session.sources || []) sum = addNullable(sum, numOrNull(src[spendKey]));
-        value = sum;
-      }
+      const value = numOrNull(session[spendKey]);
       phase[spendKey] = addNullable(phase[spendKey], value);
       spend[spendKey] = addNullable(spend[spendKey], value);
     }
+    const sessionCostUsdTotal = costUsdTotalOf(session);
+    session.costUsdTotal = roundUsd4(sessionCostUsdTotal);
+    phase.costUsdTotal = addNullable(phase.costUsdTotal, sessionCostUsdTotal);
+    spend.costUsdTotal = addNullable(spend.costUsdTotal, sessionCostUsdTotal);
     if (session.role && !phase.agents.includes(session.role)) phase.agents.push(session.role);
     if (session.model && !phase.models.includes(session.model)) phase.models.push(session.model);
     if (Array.isArray(session.models)) {
@@ -335,31 +514,29 @@ function recompute(metrics) {
     }
     phases[key] = phase;
 
-    for (const src of session.sources || []) {
-      const platform = src.platform;
-      if (platform && byPlatform[platform]) {
-        const bucket = byPlatform[platform];
-        bucket.inputTokens = addNullable(bucket.inputTokens, numOrNull(src.inputTokens));
-        bucket.outputTokens = addNullable(bucket.outputTokens, numOrNull(src.outputTokens));
-        bucket.totalTokens = addNullable(bucket.totalTokens, numOrNull(src.totalTokens));
-        bucket.costUsd = addNullable(bucket.costUsd, numOrNull(src.costUsd));
-        bucket.ampCredits = addNullable(bucket.ampCredits, numOrNull(src.ampCredits));
-        bucket.costUsdEstimated = addNullable(bucket.costUsdEstimated, numOrNull(src.costUsdEstimated));
-        if (platform === 'claude') bucket.source = 'claude-jsonl';
-        else if (platform === 'amp') bucket.source = 'amp-thread';
-        else if (platform === 'cursor') bucket.source = 'cursor-hook';
+    const platform = session.platform;
+    if (platform && byPlatform[platform]) {
+      const bucket = byPlatform[platform];
+      for (const key of ['inputTokens', 'outputTokens', 'totalTokens', 'costUsd', 'ampCredits', 'costUsdEstimated']) {
+        bucket[key] = addNullable(bucket[key], numOrNull(session[key]));
       }
+      bucket.costUsdTotal = addNullable(bucket.costUsdTotal, sessionCostUsdTotal);
+      if ((session.sourceIds || []).length) bucket.source = platform === 'cursor' ? 'cursor-hook' : `${platform}-jsonl`;
+    }
+    const modelRows = (session.byModel || []).length ? session.byModel : [session];
+    for (const src of modelRows) {
       if (src.model) {
-        const modelKey = `${src.model}::${src.platform || ''}`;
+        const modelKey = `${src.model}::${src.platform || session.platform || ''}`;
         const row = byModel.get(modelKey) || {
           model: src.model,
-          platform: src.platform || null,
+          platform: src.platform || session.platform || null,
           inputTokens: null,
           outputTokens: null,
           totalTokens: null,
           costUsd: null,
           ampCredits: null,
           costUsdEstimated: null,
+          costUsdTotal: null,
         };
         row.inputTokens = addNullable(row.inputTokens, numOrNull(src.inputTokens));
         row.outputTokens = addNullable(row.outputTokens, numOrNull(src.outputTokens));
@@ -367,6 +544,7 @@ function recompute(metrics) {
         row.costUsd = addNullable(row.costUsd, numOrNull(src.costUsd));
         row.ampCredits = addNullable(row.ampCredits, numOrNull(src.ampCredits));
         row.costUsdEstimated = addNullable(row.costUsdEstimated, numOrNull(src.costUsdEstimated));
+        row.costUsdTotal = addNullable(row.costUsdTotal, costUsdTotalOf(src));
         byModel.set(modelKey, row);
       }
     }
@@ -375,6 +553,29 @@ function recompute(metrics) {
   if (firstStart && lastEnd) {
     totals.leadTimeMs = Math.max(0, Date.parse(lastEnd) - Date.parse(firstStart));
   }
+  for (const phase of Object.values(phases)) {
+    const startMs = timestampMs(phase.startedAt);
+    const endMs = timestampMs(phase.endedAt);
+    phase.leadTimeMs = Number.isFinite(startMs) && Number.isFinite(endMs)
+      ? Math.max(0, endMs - startMs)
+      : null;
+    phase.costUsd = roundUsd4(phase.costUsd);
+    phase.costUsdEstimated = roundUsd4(phase.costUsdEstimated);
+    phase.costUsdTotal = roundUsd4(phase.costUsdTotal);
+  }
+  spend.costUsd = roundUsd4(spend.costUsd);
+  spend.costUsdEstimated = roundUsd4(spend.costUsdEstimated);
+  spend.costUsdTotal = roundUsd4(spend.costUsdTotal);
+  for (const bucket of Object.values(byPlatform)) {
+    bucket.costUsd = roundUsd4(bucket.costUsd);
+    bucket.costUsdEstimated = roundUsd4(bucket.costUsdEstimated);
+    bucket.costUsdTotal = roundUsd4(bucket.costUsdTotal);
+  }
+  for (const row of byModel.values()) {
+    row.costUsd = roundUsd4(row.costUsd);
+    row.costUsdEstimated = roundUsd4(row.costUsdEstimated);
+    row.costUsdTotal = roundUsd4(row.costUsdTotal);
+  }
   metrics.phases = phases;
   metrics.totals = totals;
   metrics.spend = spend;
@@ -382,12 +583,18 @@ function recompute(metrics) {
   metrics.spendByModel = [...byModel.values()];
 }
 
-function incomingCursorSources(cwd, existing, fingerprints, windowStart, windowEnd, byId, exclusiveEnd) {
+function incomingCursorSources(cwd, existing, fingerprints, windowStart, windowEnd, byId, exclusiveEnd, filterConversationId) {
   const startMs = windowStart ? Date.parse(windowStart) : NaN;
   const endMs = windowEnd ? Date.parse(windowEnd) : NaN;
+  const filterId = String(filterConversationId || '').trim();
   const bestById = new Map();
   for (const [id, row] of byId) {
-    if (existing.has(id)) continue;
+    if (filterId) {
+      const rowConversationId = row.conversationId == null || row.conversationId === ''
+        ? ''
+        : String(row.conversationId).trim();
+      if (rowConversationId !== filterId) continue;
+    }
     const atMs = Date.parse(row.at);
     if (Number.isFinite(startMs) && Number.isFinite(atMs) && atMs < startMs) continue;
     if (Number.isFinite(endMs) && Number.isFinite(atMs)) {
@@ -429,14 +636,7 @@ function incomingCursorSources(cwd, existing, fingerprints, windowStart, windowE
 }
 
 function existingFingerprints(metrics) {
-  const set = new Set();
-  for (const session of metrics.sessions || []) {
-    for (const src of session.sources || []) {
-      const fp = cursorSpendFingerprint(src);
-      if (fp) set.add(fp);
-    }
-  }
-  return set;
+  return new Set();
 }
 
 function sessionHasSpendNumbers(session) {
@@ -459,7 +659,7 @@ function sessionSpendFrozen(session) {
 
 function syncAdapterSessionTotals(session) {
   if (sessionSpendFrozen(session)) return false;
-  const totals = sourceTotals(session.sources || []);
+  const totals = sourceTotals(session.byModel || []);
   let changed = false;
   for (const key of ['inputTokens', 'outputTokens', 'totalTokens', 'costUsd', 'costUsdEstimated']) {
     if (session[key] !== totals[key]) {
@@ -467,7 +667,7 @@ function syncAdapterSessionTotals(session) {
       changed = true;
     }
   }
-  if ((session.sources || []).length > 0 && session.spendSource !== 'adapter') {
+  if ((session.sourceIds || []).length > 0 && session.spendSource !== 'adapter') {
     session.spendSource = 'adapter';
     changed = true;
   }
@@ -475,27 +675,113 @@ function syncAdapterSessionTotals(session) {
 }
 
 function enrichMetrics(metrics, cwd) {
-  const byId = loadCursorUsageById(cwd);
   let changed = false;
   for (const session of metrics.sessions || []) {
-    const deduped = dedupeCursorSources(session.sources || []);
-    if (deduped.length !== (session.sources || []).length) {
-      session.sources = deduped;
-      changed = true;
-    } else {
-      session.sources = deduped;
-    }
-    if (attachCursorEstimates(session.sources || [], byId)) changed = true;
     if (syncAdapterSessionTotals(session)) changed = true;
     if (
       session.spendSource === 'unreported'
-      && (session.inputTokens != null || session.totalTokens != null || (session.sources || []).length)
+      && (session.inputTokens != null || session.totalTokens != null || (session.sourceIds || []).length)
     ) {
       session.spendSource = 'adapter';
       changed = true;
     }
   }
   return changed;
+}
+
+function compactModelRows(sources) {
+  const rows = new Map();
+  for (const source of sources || []) {
+    if (!source) continue;
+    const model = source.model == null || source.model === '' ? null : String(source.model);
+    const key = `${source.platform || ''}::${model || ''}`;
+    const row = rows.get(key) || {
+      model,
+      platform: source.platform || null,
+      inputTokens: null,
+      outputTokens: null,
+      totalTokens: null,
+      costUsd: null,
+      costUsdEstimated: null,
+    };
+    for (const field of ['inputTokens', 'outputTokens', 'totalTokens', 'costUsd']) {
+      row[field] = addNullable(row[field], numOrNull(source[field]));
+    }
+    row.costUsdEstimated = roundUsd4(addNullable(row.costUsdEstimated, numOrNull(source.costUsdEstimated)));
+    if (source.costSource) row.costSource = source.costSource;
+    rows.set(key, row);
+  }
+  return [...rows.values()];
+}
+
+function mergeModelRows(current, incoming) {
+  return compactModelRows([...(current || []), ...(incoming || [])]);
+}
+
+function normalizeMetricsV2(metrics) {
+  metrics.version = 2;
+  metrics.sessions = Array.isArray(metrics.sessions) ? metrics.sessions : [];
+  for (const session of metrics.sessions) {
+    if (Array.isArray(session.sources)) {
+      const bestById = new Map();
+      for (const source of session.sources) {
+        if (!source || source.id == null || source.id === '') continue;
+        const id = String(source.id);
+        const previous = bestById.get(id);
+        if (!previous || (numOrNull(source.totalTokens) ?? 0) >= (numOrNull(previous.totalTokens) ?? 0)) bestById.set(id, source);
+      }
+      const compactSources = [...bestById.values()].map((source) => ({
+        ...source,
+        model: source.model || session.model || null,
+        platform: source.platform || session.platform || null,
+      }));
+      session.sourceIds = [];
+      session.sourceTotals = {};
+      for (const source of compactSources) {
+        if (!source || source.id == null || source.id === '') continue;
+        const id = String(source.id);
+        if (!session.sourceIds.includes(id)) session.sourceIds.push(id);
+        const total = numOrNull(source.totalTokens);
+        if (total != null) session.sourceTotals[id] = Math.max(numOrNull(session.sourceTotals[id]) ?? 0, total);
+      }
+      session.byModel = compactModelRows(compactSources);
+      if (!session.platform && compactSources[0] && compactSources[0].platform) session.platform = compactSources[0].platform;
+      if (!session.model && compactSources[0] && compactSources[0].model) session.model = compactSources[0].model;
+      delete session.sources;
+    } else {
+      session.sourceIds = Array.isArray(session.sourceIds) ? [...new Set(session.sourceIds.map(String))] : [];
+      session.sourceTotals = session.sourceTotals && typeof session.sourceTotals === 'object' ? session.sourceTotals : {};
+      session.byModel = Array.isArray(session.byModel) ? session.byModel : [];
+    }
+  }
+  return metrics;
+}
+
+function mergeIncomingCompact(session, incoming) {
+  session.sourceIds = Array.isArray(session.sourceIds) ? session.sourceIds : [];
+  session.sourceTotals = session.sourceTotals && typeof session.sourceTotals === 'object' ? session.sourceTotals : {};
+  const deltaSources = [];
+  for (const source of incoming || []) {
+    const id = String(source.id);
+    const previous = numOrNull(session.sourceTotals[id]);
+    const next = numOrNull(source.totalTokens);
+    if (!session.sourceIds.includes(id)) session.sourceIds.push(id);
+    if (next != null) session.sourceTotals[id] = Math.max(previous ?? 0, next);
+    if (previous == null || next == null) {
+      deltaSources.push(source);
+      continue;
+    }
+    const delta = Math.max(0, next - previous);
+    if (!delta) continue;
+    const ratio = next > 0 ? delta / next : 0;
+    const copy = { ...source };
+    for (const field of ['inputTokens', 'outputTokens', 'totalTokens', 'costUsd', 'costUsdEstimated']) {
+      const value = numOrNull(copy[field]);
+      if (value != null) copy[field] = field.includes('Usd') ? roundUsd4(value * ratio) : Math.round(value * ratio);
+    }
+    deltaSources.push(copy);
+  }
+  session.byModel = mergeModelRows(session.byModel, compactModelRows(deltaSources));
 }
 
 function backfillMetricsFile(cwd, filePath) {
@@ -507,18 +793,14 @@ function backfillMetricsFile(cwd, filePath) {
     return;
   }
   if (!metrics || typeof metrics !== 'object') return;
+  const schemaChanged = metrics.version !== 2 || (metrics.sessions || []).some((session) => Array.isArray(session.sources));
+  normalizeMetricsV2(metrics);
   const sessions = Array.isArray(metrics.sessions) ? metrics.sessions : [];
   if (!sessions.length) return;
-  let collapsed = false;
-  for (const session of sessions) {
-    const next = dedupeCursorSources(session.sources || []);
-    if (next.length !== (session.sources || []).length) collapsed = true;
-    session.sources = next;
-  }
   const last = sessions[sessions.length - 1];
   const byId = loadCursorUsageById(cwd);
   const leftoverEnd = leftoverWindowEnd(metrics, last);
-  const incoming = last.endedAt && leftoverEnd
+  const incoming = (last.endedAt && leftoverEnd
     ? incomingCursorSources(
       cwd,
       existingIds(metrics),
@@ -527,12 +809,18 @@ function backfillMetricsFile(cwd, filePath) {
       leftoverEnd,
       byId,
       leftoverEndExclusive(metrics),
+      last.threadId,
     )
-    : [];
+    : []).filter((source) => {
+      const previous = numOrNull(last.sourceTotals && last.sourceTotals[source.id]);
+      return previous == null || (numOrNull(source.totalTokens) ?? 0) > previous;
+    });
   if (incoming.length) {
-    last.sources = [...(last.sources || []), ...incoming];
+    mergeIncomingCompact(last, incoming);
+    if (!last.platform) last.platform = 'cursor';
+    if (!last.model && incoming[0].model) last.model = incoming[0].model;
     if (!sessionSpendFrozen(last)) {
-      const totals = sourceTotals(last.sources);
+      const totals = sourceTotals(last.byModel);
       last.inputTokens = totals.inputTokens;
       last.outputTokens = totals.outputTokens;
       last.totalTokens = totals.totalTokens;
@@ -542,7 +830,7 @@ function backfillMetricsFile(cwd, filePath) {
     }
   }
   const enriched = enrichMetrics(metrics, cwd);
-  if (!incoming.length && !enriched && !collapsed) return;
+  if (!incoming.length && !enriched && !schemaChanged) return;
   metrics.updatedAt = new Date().toISOString();
   recompute(metrics);
   writeFileSync(filePath, `${JSON.stringify(metrics, null, 2)}\n`);
@@ -602,14 +890,7 @@ function newestArchiveDirForName(archiveDir, changeName) {
   return best;
 }
 
-function main(raw) {
-  let payload = {};
-  try {
-    payload = raw ? JSON.parse(raw) : {};
-  } catch {
-    payload = {};
-  }
-  const cwd = resolveBaseDir(payload && typeof payload === 'object' ? payload : {});
+function backfillRoot(cwd) {
   const changesDir = join(cwd, 'openspec', 'changes');
   if (!existsSync(changesDir)) return;
   const activeNames = new Set();
@@ -645,21 +926,48 @@ function main(raw) {
   }
 }
 
-if (process.stdin.isTTY) {
+function parsePayload(raw) {
+  if (raw && typeof raw === 'object') return raw;
   try {
-    main('');
-  } catch {}
-  process.exit(0);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
 }
 
-let input = '';
-process.stdin.on('data', (chunk) => {
-  input += chunk;
-});
-process.stdin.on('end', () => {
-  try {
-    main(input);
-  } catch {}
-  process.exit(0);
-});
-process.stdin.on('error', () => process.exit(0));
+function main(raw) {
+  const payload = parsePayload(raw);
+  const candidates = leftoverCandidateRoots(payload && typeof payload === 'object' ? payload : {});
+  for (const cwd of candidates) {
+    try {
+      backfillRoot(cwd);
+    } catch {}
+  }
+}
+
+if (require.main === module) {
+  if (process.stdin.isTTY) {
+    try {
+      main('');
+    } catch {}
+    process.exit(0);
+  }
+
+  let input = '';
+  process.stdin.on('data', (chunk) => {
+    input += chunk;
+  });
+  process.stdin.on('end', () => {
+    try {
+      main(input);
+    } catch {}
+    process.exit(0);
+  });
+  process.stdin.on('error', () => process.exit(0));
+}
+
+module.exports = {
+  main,
+  backfillLeftover: main,
+  resolveBaseDir,
+};

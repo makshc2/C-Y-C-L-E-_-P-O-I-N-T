@@ -47,7 +47,10 @@
   --section-pad-y: 116px;
   --sheet-w: 68%;
   --fishky-photo-w: 507px;
-  --fishky-photo-h: 810px;
+  --fishky-photo-h: 437px;
+  --fishky-map-w: 1430px;
+  --fishky-map-h: 1233px;
+  --text-fishky-lead: 32px;
   --section-h-home: 480px;
   --icon-hit-workshop-w: 530px;
   --icon-hit-workshop-h: 415px;

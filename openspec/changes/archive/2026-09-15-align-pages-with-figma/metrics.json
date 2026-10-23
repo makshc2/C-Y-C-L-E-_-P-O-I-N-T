@@ -1,15 +1,16 @@
 {
-  "version": 1,
+  "version": 2,
   "change": "align-pages-with-figma",
   "createdAt": "2026-09-15T18:57:47.496Z",
-  "updatedAt": "2026-09-15T21:50:54.910Z",
+  "updatedAt": "2026-10-23T11:44:34.019Z",
   "archivedAt": "2026-09-15T21:50:54.910Z",
   "spend": {
     "inputTokens": null,
     "outputTokens": null,
     "totalTokens": null,
-    "costUsd": 0.10200000000000001,
-    "costUsdEstimated": null
+    "costUsd": 0.102,
+    "costUsdEstimated": null,
+    "costUsdTotal": 0.102
   },
   "spendByPlatform": {
     "cursor": {
@@ -19,15 +20,17 @@
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
+      "costUsdTotal": null,
       "source": "none"
     },
     "claude": {
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
-      "costUsd": 0.10200000000000001,
+      "costUsd": 0.102,
       "ampCredits": null,
       "costUsdEstimated": null,
+      "costUsdTotal": 0.102,
       "source": "none"
     },
     "amp": {
@@ -37,6 +40,7 @@
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
+      "costUsdTotal": null,
       "source": "none"
     }
   },
@@ -49,7 +53,8 @@
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
-      "costUsdEstimated": null
+      "costUsdEstimated": null,
+      "costUsdTotal": null
     },
     {
       "model": "claude-fable-5-1",
@@ -59,7 +64,8 @@
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
-      "costUsdEstimated": null
+      "costUsdEstimated": null,
+      "costUsdTotal": null
     },
     {
       "model": "claude-sonnet-5",
@@ -69,7 +75,8 @@
       "totalTokens": null,
       "costUsd": 0.034,
       "ampCredits": null,
-      "costUsdEstimated": null
+      "costUsdEstimated": null,
+      "costUsdTotal": 0.034
     },
     {
       "model": "claude-opus-5[1m]",
@@ -79,7 +86,8 @@
       "totalTokens": null,
       "costUsd": 0.068,
       "ampCredits": null,
-      "costUsdEstimated": null
+      "costUsdEstimated": null,
+      "costUsdTotal": 0.068
     }
   ],
   "totals": {
@@ -92,11 +100,15 @@
     "explore": {
       "sessions": 1,
       "durationMs": null,
+      "startedAt": null,
+      "endedAt": "2026-09-15T18:57:47.496Z",
+      "leadTimeMs": null,
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "costUsdEstimated": null,
+      "costUsdTotal": null,
       "agents": [
         "Explorer"
       ],
@@ -107,11 +119,15 @@
     "design": {
       "sessions": 1,
       "durationMs": 1266057,
+      "startedAt": "2026-09-15T18:59:53.485Z",
+      "endedAt": "2026-09-15T19:20:59.542Z",
+      "leadTimeMs": 1266057,
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "costUsdEstimated": null,
+      "costUsdTotal": null,
       "agents": [
         "Design Intake"
       ],
@@ -122,11 +138,15 @@
     "spec": {
       "sessions": 2,
       "durationMs": 2436631,
+      "startedAt": "2026-09-15T19:25:43.890Z",
+      "endedAt": "2026-09-15T21:16:46.053Z",
+      "leadTimeMs": 6662163,
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "costUsdEstimated": null,
+      "costUsdTotal": null,
       "agents": [
         "spec-architect (propose)",
         "spec-architect (propose"
@@ -138,11 +158,15 @@
     "review": {
       "sessions": 2,
       "durationMs": 1432589,
+      "startedAt": "2026-09-15T20:45:53.448Z",
+      "endedAt": "2026-09-15T21:25:31.044Z",
+      "leadTimeMs": 2377596,
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": 0.034,
       "costUsdEstimated": null,
+      "costUsdTotal": 0.034,
       "agents": [
         "spec-reviewer (review)",
         "spec-reviewer (review"
@@ -156,11 +180,15 @@
     "apply": {
       "sessions": 1,
       "durationMs": 756135,
+      "startedAt": "2026-09-15T21:27:27.170Z",
+      "endedAt": "2026-09-15T21:40:03.305Z",
+      "leadTimeMs": 756135,
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": 0.034,
       "costUsdEstimated": null,
+      "costUsdTotal": 0.034,
       "agents": [
         "apply (conductor"
       ],
@@ -173,11 +201,15 @@
     "archive": {
       "sessions": 1,
       "durationMs": 87757,
+      "startedAt": "2026-09-15T21:49:27.153Z",
+      "endedAt": "2026-09-15T21:50:54.910Z",
+      "leadTimeMs": 87757,
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": 0.034,
       "costUsdEstimated": null,
+      "costUsdTotal": 0.034,
       "agents": [
         "Archiver"
       ],
@@ -201,14 +233,17 @@
       "platform": "claude",
       "threadId": null,
       "tasks": null,
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
-      "spendSource": "unreported"
+      "spendSource": "unreported",
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": null
     },
     {
       "startedAt": "2026-09-15T18:59:53.485Z",
@@ -222,14 +257,17 @@
       "platform": "claude",
       "threadId": null,
       "tasks": null,
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
-      "spendSource": "unreported"
+      "spendSource": "unreported",
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": null
     },
     {
       "startedAt": "2026-09-15T19:25:43.890Z",
@@ -243,14 +281,17 @@
       "platform": "claude",
       "threadId": null,
       "tasks": "0/11",
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
-      "spendSource": "unreported"
+      "spendSource": "unreported",
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": null
     },
     {
       "startedAt": "2026-09-15T20:45:53.448Z",
@@ -264,7 +305,6 @@
       "platform": "claude",
       "threadId": null,
       "tasks": "0/11",
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
@@ -306,7 +346,11 @@
           "outputTokens": 20,
           "costUsd": 0.002
         }
-      ]
+      ],
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": 0.034
     },
     {
       "startedAt": "2026-09-15T21:07:38.331Z",
@@ -320,14 +364,17 @@
       "platform": "claude",
       "threadId": null,
       "tasks": "0/11",
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
-      "spendSource": "unreported"
+      "spendSource": "unreported",
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": null
     },
     {
       "startedAt": "2026-09-15T21:19:10.456Z",
@@ -341,14 +388,17 @@
       "platform": "claude",
       "threadId": null,
       "tasks": "0/11",
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
       "costUsd": null,
       "ampCredits": null,
       "costUsdEstimated": null,
-      "spendSource": "unreported"
+      "spendSource": "unreported",
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": null
     },
     {
       "startedAt": "2026-09-15T21:27:27.170Z",
@@ -362,7 +412,6 @@
       "platform": "claude",
       "threadId": null,
       "tasks": "11/11",
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
@@ -404,7 +453,11 @@
           "outputTokens": 20,
           "costUsd": 0.002
         }
-      ]
+      ],
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": 0.034
     },
     {
       "startedAt": "2026-09-15T21:49:27.153Z",
@@ -418,7 +471,6 @@
       "platform": "claude",
       "threadId": null,
       "tasks": "11/11",
-      "sources": [],
       "inputTokens": null,
       "outputTokens": null,
       "totalTokens": null,
@@ -460,7 +512,11 @@
           "outputTokens": 20,
           "costUsd": 0.002
         }
-      ]
+      ],
+      "sourceIds": [],
+      "sourceTotals": {},
+      "byModel": [],
+      "costUsdTotal": 0.034
     }
   ],
   "pending": null
