@@ -143,18 +143,28 @@ import photoUrl from '@/assets/site/gs-detail-photo.png'
 }
 
 .gs__cta {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   margin-top: 8px;
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-green);
   font-family: Helvetica, var(--font-sans);
   font-size: var(--text-body);
   font-weight: var(--font-weight-regular);
   line-height: 1.2;
-  color: var(--color-green);
+  color: var(--color-fg);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gs__cta:hover {
+  background-color: var(--color-accent-lime);
 }
 
 .gs__cta:focus-visible {
-  outline: 2px solid var(--color-green);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-fg);
+  outline-offset: 3px;
 }
 
 @media (max-width: 767px) {
