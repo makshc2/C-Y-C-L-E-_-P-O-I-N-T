@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /projects/golden-sprints/app
+
+Sitemap: https://cyclepoint.kyiv.ua/sitemap.xml
